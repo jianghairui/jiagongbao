@@ -1,0 +1,112 @@
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页
+    <span class="c-gray en">&gt;</span>
+    系统管理
+    <span class="c-gray en">&gt;</span>
+    基本设置
+    <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a>
+</nav>
+<div class="page-container">
+    <form class="form form-horizontal" id="formAjax">
+        <div id="tab-system" class="HuiTab">
+            <div class="tabBar cl">
+                <span>平台设置</span>
+                <span>安全设置</span>
+            </div>
+            <div class="tabCon">
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">
+                        <span class="c-red">*</span>
+                        会员金额(元/年)：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" id="vip_price" placeholder="输入金额,格式1000.00" value="{$info.vip_price}" class="input-text" name="vip_price" oninput="this.value=/^\d{1,8}(\.\d{0,2})?$/.test(this.value) ? this.value : ''">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">
+                        <span class="c-red">*</span>
+                        非会员报价次数(/月)：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="number" id="credit" placeholder="输入整数" value="{$info.free_chance}" class="input-text" name="free_chance">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">会员特权说明：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <textarea name="vip_desc" cols="" rows="" class="textarea" maxlength="1000" placeholder="会员特权说明" oninput="this.value.length<=1000?$('#textlen').text(this.value.length):$('#textlen').text(1000)" >{$info.vip_desc}</textarea>
+                        <p class="textarea-numberbar"><em class="textarea-length" id="textlen">0</em>/1000</p>
+                    </div>
+                </div>
+            </div>
+            <div class="tabCon">
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">允许访问后台的IP列表：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <textarea class="textarea" name="allow_ip" id="" placeholder="ip格式 x.x.x.x 多个ip用英文逗号隔开"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button id="submit-btn" class="btn btn-primary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $("#tab-system").Huitab({
+            index:0
+        });
+
+        var isclick = true
+        //表单验证
+        $("#formAjax").validate({
+            rules:{
+                free_chance: {
+                    required: true
+                }
+            },
+            focusCleanup:true,
+            success:"valid",
+            submitHandler:function(form){
+                if(isclick === true) {
+                    isclick = false
+                    $(form).ajaxSubmit({
+                        type: 'post',
+                        url: "{:url('System/settingMod')}" ,
+                        success: function(data){
+                            console.log(data)
+                            if(data.code == 1) {
+                                layer.msg('保存成功!',{icon:1,time:1000},function () {
+                                    isclick = true
+                                });
+                            }else {
+                                layer.msg(data.data,{icon:2,time:1000},function () {
+                                    isclick = true
+                                });
+                            }
+                        },
+                        error: function(msg){
+                            layer.msg('接口请求失败!',{icon:5,time:1000},function () {
+                                isclick = true
+                            });
+                        }
+                    });
+                }
+
+            }
+        });
+
+        var textlen = $("textarea[name='vip_desc']").val().length;
+        $("#textlen").text(textlen);
+
+
+    });
+</script>

@@ -1,0 +1,160 @@
+<style>
+    .thumbnail{ width:300px}
+</style>
+<article class="page-container" style="width: 70%">
+    <form class="form form-horizontal" id="form-article-add">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">
+                <span id="btn-star1" class="btn btn-primary btn-uploadstar radius ml-10">   Logo</span>
+            </label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <div class="uploader-thum-container">
+                    <div id="fileList" class="uploader-list">
+                        <img class="thumbnail" src="/{$info.logo}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>平台名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$info.name}" placeholder="" id="name" name="name">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>平台邮箱：</label>
+            <div class="formControls col-xs-4 col-sm-4">
+                <input type="email" class="input-text" value="{$info.email}" placeholder="" id="email" name="email">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>客服QQ：</label>
+            <div class="formControls col-xs-4 col-sm-4">
+                <input type="text" class="input-text" value="{$info.qq}" placeholder="" id="qq" name="qq">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>客服微信：</label>
+            <div class="formControls col-xs-4 col-sm-4">
+                <input type="text" class="input-text" value="{$info.weixin}" placeholder="" id="weixin" name="weixin">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>联系电话：</label>
+            <div class="formControls col-xs-4 col-sm-4">
+                <input type="text" class="input-text" value="{$info.tel}" placeholder="" id="tel" name="tel">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">平台简介：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <textarea id="editor" type="text/plain" name="intro" style="width:100%;height:400px;">{$info.intro|htmlspecialchars_decode}</textarea>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button class="btn btn-primary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+            </div>
+        </div>
+        <input type="file" name="file" id="file" style="display: none;">
+    </form>
+</article>
+
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+
+<script type="text/javascript" src="/lib/ueditor/1.4.3/ueditor.config.js"></script>
+<script type="text/javascript" src="/lib/ueditor/1.4.3/ueditor.all.min.js"> </script>
+<script type="text/javascript" src="/lib/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script>
+<script type="text/javascript" src="/lib/checkfile.js"></script>
+
+<script type="text/javascript">
+    $(function(){
+
+        var ue = UE.getEditor('editor');
+
+        $('.skin-minimal input').iCheck({
+            checkboxClass: 'icheckbox-blue',
+            radioClass: 'iradio-blue',
+            increaseArea: '20%'
+        });
+
+        var isclick = true;
+        //表单验证
+        $("#form-article-add").validate({
+            rules:{
+                name:{
+                    required:true,
+                    maxlength:30
+                },
+                email: {
+                    required:true,
+                    maxlength:50,
+                    email:true
+                },
+                tel:{
+                    required:true,
+                    maxlength:15,
+                    isMobile:true
+                },
+                qq: {
+                    required:true,
+                    maxlength:15,
+                    isQq:true
+                },
+                weixin: {
+                    required:true,
+                    maxlength:30
+                }
+
+            },
+            focusCleanup:false,
+            success:"valid",
+            submitHandler:function(form){
+                if(isclick === true) {
+                    isclick = false;
+                    $(form).ajaxSubmit({
+                        type: 'post',
+                        url: "{:url('Banner/company')}" ,
+                        success: function(data){
+                            // console.log(data);return;
+                            if(data.code == 1) {
+                                layer.msg('保存成功!',{icon:1,time:1000});
+                            }else {
+                                layer.msg(data.data,{icon:2,time:1000});
+                            }
+                            isclick = true
+
+                        },
+                        error: function(XmlHttpRequest, textStatus, errorThrown){
+                            layer.msg('接口请求失败!',{icon:5,time:1000});
+                            isclick = true
+                        }
+                    });
+                }
+
+            }
+        });
+
+        $("#file").change(function (e) {
+            var img = e.target.files[0];
+            if (typeof(img) == "undefined") {
+                var src = '';
+            }else {
+                if(checkfile('file') !== true) {
+                    $("#file").val('');
+                    $("#fileList").html('');
+                    return false;
+                }
+                var src = window.URL.createObjectURL(img);
+                $("#fileList").html('<img class="thumbnail" src="'+src+'">');
+            }
+
+        });
+
+        $("#btn-star1").click(function(){
+            $("#file").click();
+        });
+    });
+</script>

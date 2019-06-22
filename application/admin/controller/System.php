@@ -1,0 +1,94 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: JHR
+ * Date: 2018/10/15
+ * Time: 20:30
+ */
+namespace app\admin\controller;
+
+use think\Db;
+class System extends Base {
+
+    public function setting() {
+        try {
+            $info = Db::table('mp_setting')->find();
+        } catch(\Exception $e) {
+            die($e->getMessage());
+        }
+        $this->assign('info',$info);
+        return $this->fetch();
+    }
+
+    public function settingMod() {
+        $val['vip_price'] = input('post.vip_price');
+        $val['free_chance'] = input('post.free_chance');
+        $val['vip_desc'] = input('post.vip_desc');
+        checkInput($val);
+        $val['allow_ip'] = input('post.allow_ip');
+
+        if($val['allow_ip']) {
+            $ips = explode(',',$val['allow_ip']);
+            foreach ($ips as $v) {
+                if(!filter_var($v,FILTER_VALIDATE_IP)) {
+                    return ajax('ip不合法',-1);
+                }
+            }
+        }
+        try {
+            Db::table('mp_setting')->where('id','=',1)->update($val);
+        }catch (\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax($val);
+    }
+
+    public function syslog() {
+
+        $param['logmin'] = input('param.logmin');
+        $param['logmax'] = input('param.logmax');
+        $param['search'] = input('param.search');
+
+        $page['query'] = http_build_query(input('param.'));
+
+        $curr_page = input('param.page',1);
+        $perpage = input('param.perpage',20);
+
+        $where = [];
+        if($param['logmin']) {
+            $where[] = ['s.create_time','>=',strtotime(date('Y-m-d 00:00:00',strtotime($param['logmin'])))];
+        }
+
+        if($param['logmax']) {
+            $where[] = ['s.create_time','<=',strtotime(date('Y-m-d 23:59:59',strtotime($param['logmax'])))];
+        }
+
+        if($param['search']) {
+            $where[] = ['a.realname|s.detail','like',"%{$param['search']}%"];
+        }
+        try {
+            $count = Db::table('mp_syslog')->alias('s')
+                ->join('admin a','s.admin_id=a.id','left')
+                ->where($where)->count();
+            $list = Db::table('mp_syslog')->alias('s')
+                ->join('admin a','s.admin_id=a.id','left')
+                ->where($where)
+                ->order(['create_time'=>'DESC'])
+                ->field('s.*,a.realname,a.username')
+                ->limit(($curr_page - 1)*$perpage,$perpage)
+                ->select();
+        } catch(\Exception $e) {
+            die($e->getMessage());
+        }
+
+        $page['count'] = $count;
+        $page['curr'] = $curr_page;
+        $page['totalPage'] = ceil($count/$perpage);
+        $this->assign('list',$list);
+        $this->assign('page',$page);
+        return $this->fetch();
+    }
+
+
+
+}
