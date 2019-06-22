@@ -354,5 +354,43 @@ class My extends Common {
 
     }
 
+    //关于我们
+    public function aboutUs() {
+        try {
+            $info = Db::table('mp_company')->where('id','=',1)->field('logo,name,intro')->find();
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax($info);
+    }
+    //联系我们
+    public function contactUs() {
+        try {
+            $info = Db::table('mp_company')->where('id','=',1)->field('name,email,qq,weixin,tel')->find();
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax($info);
+    }
+    //获取平台各模块信息
+    public function getAppInfo() {
+        try {
+            $info = Db::table('mp_setting')->where('id','=',1)->find();
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax($info);
+    }
+
+    //统计进入充值页面次数
+    public function vipPageViewTimes() {
+        try {
+            Db::table('mp_user')->where('id','=',$this->myinfo['id'])->setInc('vip_pv',1);
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax();
+    }
+
 
 }

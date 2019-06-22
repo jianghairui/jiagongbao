@@ -15,8 +15,11 @@ class Order extends Base {
         $param['logmax'] = input('param.logmax');
         $param['search'] = input('param.search');
         $param['cate_id'] = input('param.cate_id');
+        $param['status'] = input('param.status','');
+        $param['provinceCode'] = input('param.provinceCode','');
+        $param['cityCode'] = input('param.cityCode','');
+        $param['regionCode'] = input('param.regionCode','');
         $page['query'] = http_build_query(input('param.'));
-
         $curr_page = input('param.page',1);
         $perpage = input('param.perpage',10);
         $where = [
@@ -24,28 +27,52 @@ class Order extends Base {
         ];
         $order = ['id'=>'DESC'];
         if($param['search']) {
-            $where[] = ['title','like',"%{$param['search']}%"];
+            $where[] = ['title|linktel|compname','like',"%{$param['search']}%"];
         }
 
         if($param['logmin']) {
-            $where[] = ['create_time','>=',date('Y-m-d 00:00:00',strtotime($param['logmin']))];
+            $where[] = ['create_time','>=',strtotime(date('Y-m-d 00:00:00',strtotime($param['logmin'])))];
         }
 
         if($param['logmax']) {
-            $where[] = ['create_time','<=',date('Y-m-d 23:59:59',strtotime($param['logmax']))];
+            $where[] = ['create_time','<=',strtotime(date('Y-m-d 23:59:59',strtotime($param['logmax'])))];
         }
 
-//        $map[]=['exp','FIND_IN_SET(2,needID)'];
-//        $db->where($map)->select();
+        if($param['status'] !== '') {
+            $where[] = ['status','=',$param['status']];
+        }
+
+        if($param['regionCode']) {
+            $where[] = ['region_code','=',$param['regionCode']];
+        }elseif ($param['cityCode']) {
+            $where[] = ['city_code','=',$param['cityCode']];
+        }elseif ($param['provinceCode']) {
+            $where[] = ['province_code','=',$param['provinceCode']];
+        }
+
         try {
+            $find_in_set = [];
             if($param['cate_id']) {
-                $where[] = ['cate_ids','=',$param['cate_id']];
+                $find_in_set = "FIND_IN_SET('".$param['cate_id']."',cate_ids)";
             }
-            $cate_list = Db::table('mp_order_cate')->where('del','=',0)->select();
+
             $count = Db::table('mp_order')->where($where)->count();
             $list = Db::table('mp_order')
                 ->order($order)
+                ->where($find_in_set)
                 ->where($where)->limit(($curr_page - 1)*$perpage,$perpage)->select();
+
+            $whereCate = [
+                ['del','=',0]
+            ];
+            $cate_list = Db::table('mp_order_cate')->where($whereCate)->select();
+            $whereCity = [
+                ['pcode','=',0],
+                ['level','=',1]
+            ];
+            $province_list = Db::table('mp_city')->where($whereCity)->select();
+            $city_list = Db::table('mp_city')->where('pcode','=',$province_list[0]['code'])->select();
+            $region_list = Db::table('mp_city')->where('pcode','=',$city_list[0]['code'])->select();
         }catch (\Exception $e) {
             die('SQL错误: ' . $e->getMessage());
         }
@@ -59,8 +86,12 @@ class Order extends Base {
         $page['totalPage'] = ceil($count/$perpage);
         $this->assign('list',$list);
         $this->assign('page',$page);
-        $this->assign('cate_id',$param['cate_id']);
+        $this->assign('param',$param);
         $this->assign('cateArr',$cateArr);
+        $this->assign('cate_list',$cate_list);
+        $this->assign('province_list',$province_list);
+        $this->assign('city_list',$city_list);
+        $this->assign('region_list',$region_list);
         return $this->fetch();
     }
 
@@ -296,15 +327,59 @@ class Order extends Base {
     }
 
     public function orderDel() {
-
+        $val['id'] = input('post.id');
+        try {
+            $where = [
+                ['id','=',$val['id']]
+            ];
+            $exist = Db::table('mp_order')->where($where)->find();
+            if(!$exist) {
+                return ajax('非法参数',-1);
+            }
+            Db::table('mp_order')->where($where)->update(['del'=>1]);
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax();
     }
 
     public function orderPass() {
-
+        $val['id'] = input('post.id');
+        checkInput($val);
+        try {
+            $where = [
+                ['id','=',$val['id']],
+                ['status','=',0]
+            ];
+            $exist = Db::table('mp_order')->where($where)->find();
+            if(!$exist) {
+                return ajax('非法操作',-1);
+            }
+            Db::table('mp_order')->where($where)->update(['status'=>1]);
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax();
     }
 
     public function orderReject() {
-
+        $val['id'] = input('post.id');
+        $val['reason'] = input('post.reason');
+        checkInput($val);
+        try {
+            $where = [
+                ['id','=',$val['id']],
+                ['status','=',0]
+            ];
+            $exist = Db::table('mp_order')->where($where)->find();
+            if(!$exist) {
+                return ajax('非法操作',-1);
+            }
+            Db::table('mp_order')->where($where)->update(['status'=>2,'reason'=>$val['reason']]);
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax();
     }
 
 

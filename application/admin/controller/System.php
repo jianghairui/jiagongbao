@@ -24,6 +24,10 @@ class System extends Base {
         $val['vip_price'] = input('post.vip_price');
         $val['free_chance'] = input('post.free_chance');
         $val['vip_desc'] = input('post.vip_desc');
+        $val['pay_desc'] = input('post.pay_desc');
+        $val['corporation'] = input('post.corporation');
+        $val['bank_type'] = input('post.bank_type');
+        $val['bank_account'] = input('post.bank_account');
         checkInput($val);
         $val['allow_ip'] = input('post.allow_ip');
 
@@ -35,10 +39,25 @@ class System extends Base {
                 }
             }
         }
+        if(isset($_FILES['file'])) {
+            $info = upload('file');
+            if($info['error'] === 0) {
+                $val['vip_pic'] = $info['data'];
+            }else {
+                return ajax($info['msg'],-1);
+            }
+        }
         try {
+            $exist = Db::table('mp_setting')->where('id','=',1)->find();
             Db::table('mp_setting')->where('id','=',1)->update($val);
         }catch (\Exception $e) {
+            if(isset($val['vip_pic'])) {
+                @unlink($val['vip_pic']);
+            }
             return ajax($e->getMessage(),-1);
+        }
+        if(isset($val['vip_pic'])) {
+            @unlink($exist['vip_pic']);
         }
         return ajax($val);
     }

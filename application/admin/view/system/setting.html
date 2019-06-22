@@ -1,3 +1,6 @@
+<style>
+    .thumbnail{ width:300px}
+</style>
 <nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页
     <span class="c-gray en">&gt;</span>
     系统管理
@@ -26,7 +29,43 @@
                         <span class="c-red">*</span>
                         非会员报价次数(/月)：</label>
                     <div class="formControls col-xs-8 col-sm-9">
-                        <input type="number" id="credit" placeholder="输入整数" value="{$info.free_chance}" class="input-text" name="free_chance">
+                        <input type="number" id="free_chance" placeholder="输入整数" value="{$info.free_chance}" class="input-text" name="free_chance">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">
+                        <span class="c-red">*</span>
+                        开户公司名称：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" id="corporation" placeholder="公司名称(营业执照上)" value="{$info.corporation}" class="input-text" name="corporation" maxlength="50">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">
+                        <span class="c-red">*</span>
+                        开户银行：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" id="bank_type" placeholder="开户银行(营业执照上)" value="{$info.bank_type}" class="input-text" name="bank_type" maxlength="50">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">
+                        <span class="c-red">*</span>
+                        银行账号：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" id="bank_account" placeholder="银行账号(营业执照上)" value="{$info.bank_account}" class="input-text" name="bank_account" maxlength="50">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">
+                        <span id="btn-star" class="btn btn-primary btn-uploadstar radius ml-10">  会员宣传图</span>
+                    </label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <div class="uploader-thum-container">
+                            <div id="fileList" class="uploader-list">
+                                <img class="thumbnail" src="/{$info.vip_pic}">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="row cl">
@@ -34,6 +73,13 @@
                     <div class="formControls col-xs-8 col-sm-9">
                         <textarea name="vip_desc" cols="" rows="" class="textarea" maxlength="1000" placeholder="会员特权说明" oninput="this.value.length<=1000?$('#textlen').text(this.value.length):$('#textlen').text(1000)" >{$info.vip_desc}</textarea>
                         <p class="textarea-numberbar"><em class="textarea-length" id="textlen">0</em>/1000</p>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">支付说明：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <textarea name="pay_desc" cols="" rows="" class="textarea" maxlength="255" placeholder="支付说明" oninput="this.value.length<=255?$('#textlen1').text(this.value.length):$('#textlen1').text(255)" >{$info.pay_desc}</textarea>
+                        <p class="textarea-numberbar"><em class="textarea-length" id="textlen1">0</em>/255</p>
                     </div>
                 </div>
             </div>
@@ -51,6 +97,7 @@
                 <button id="submit-btn" class="btn btn-primary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
             </div>
         </div>
+        <input type="file" name="file" id="file" style="display: none">
     </form>
 </div>
 
@@ -59,6 +106,7 @@
 <script type="text/javascript" src="/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
 <script type="text/javascript" src="/lib/jquery.validation/1.14.0/validate-methods.js"></script>
 <script type="text/javascript" src="/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="/lib/checkfile.js"></script>
 <script type="text/javascript">
     $(function(){
         $("#tab-system").Huitab({
@@ -69,7 +117,26 @@
         //表单验证
         $("#formAjax").validate({
             rules:{
+
+                vip_price: {
+                    required: true
+                },
                 free_chance: {
+                    required: true
+                },
+                corporation: {
+                    required: true
+                },
+                bank_type: {
+                    required: true
+                },
+                bank_account: {
+                    required: true
+                },
+                vip_desc: {
+                    required: true
+                },
+                pay_desc: {
                     required: true
                 }
             },
@@ -106,6 +173,31 @@
 
         var textlen = $("textarea[name='vip_desc']").val().length;
         $("#textlen").text(textlen);
+        var textlen1 = $("textarea[name='pay_desc']").val().length;
+        $("#textlen1").text(textlen1);
+
+
+
+
+        $("#file").change(function (e) {
+            var img = e.target.files[0];
+            if (typeof(img) == "undefined") {
+                var src = '';
+            }else {
+                if(checkfile('file') !== true) {
+                    $("#file").val('');
+                    $("#fileList").html('');
+                    return false;
+                }
+                var src = window.URL.createObjectURL(img);
+                $("#fileList").html('<img class="thumbnail" src="'+src+'">');
+            }
+
+        });
+
+        $("#btn-star").click(function(){
+            $("#file").click();
+        });
 
 
     });

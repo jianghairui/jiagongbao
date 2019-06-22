@@ -3,7 +3,7 @@
         width:40px;height:40px;border-radius: 50%;
     }
 </style>
-<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 用户管理 <span class="c-gray en">&gt;</span> 用户列表 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 用户管理 <span class="c-gray en">&gt;</span> 充值列表 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
 <div class="page-container">
     <section id="formAjax">
         <div class="text-c">
@@ -12,56 +12,60 @@
             <input type="text" onfocus="WdatePicker({ maxDate:'#F{ $dp.$D(\'logmax\')||\'%y-%M-%d\' }' })" id="logmin" value="{$Think.get.logmin}" class="input-text Wdate" style="width:120px;">
             -
             <input type="text" onfocus="WdatePicker({ minDate:'#F{ $dp.$D(\'logmin\') }' })" id="logmax" value="{$Think.get.logmax}" class="input-text Wdate" style="width:120px;">
-            <input type="text" name="search" value="{$Think.get.search}" id="search" placeholder=" 用户名称或手机号" style="width:250px" class="input-text">
-            <button name="" id="search-btn" class="btn btn-success" type="button"><i class="Hui-iconfont">&#xe665;</i> 查找用户</button>
+            <input type="text" name="search" value="{$Think.get.search}" id="search" placeholder=" 订单号或手机号" style="width:250px" class="input-text">
+            <button name="" id="search-btn" class="btn btn-success" type="button"><i class="Hui-iconfont">&#xe665;</i> 查找订单</button>
             <button class="btn btn-toolbar" type="button"><i class="Hui-iconfont">&#xe634;</i> 导出Excel</button>
         </div>
     </section>
     <div class="cl pd-5 bg-1 bk-gray mt-20">
         <span class="l">
-            <a class="btn btn-success radius" data-title="添加用户" data-href="" onclick="add_info('添加用户','{:url("User/userAdd")}')" href="javascript:;">
-                <i class="Hui-iconfont">&#xe600;</i> 添加用户
-            </a>
+
         </span>
         <span class="r">共有数据：<strong>{$page.count}</strong> 条</span> </div>
     <table class="table table-border table-bordered table-bg">
         <thead>
         <tr class="text-c">
-            <th width="25"><input type="checkbox" name="" value=""></th>
+            <th width="120">订单号</th>
+            <th width="120">第三方单号</th>
+            <th width="60">金额</th>
             <th width="120">手机号</th>
             <th width="120">企业名称</th>
-            <th>企业地址</th>
-            <th width="120">负责人姓名</th>
-            <th width="120">联系电话</th>
-            <th width="60">VIP</th>
-            <th width="60">VIP_PV</th>
-            <th width="120">注册时间</th>
+            <th width="60">支付方式</th>
+            <th width="60">状态</th>
+            <th width="120">支付时间</th>
         </tr>
         </thead>
         <tbody>
         <form id="multi-check">
             {foreach $list as $li}
             <tr class="text-c userinfo">
-                <td><input type="checkbox" value="{$li.id}" name="check[]"></td>
-                <td>{$li.tel}</td>
-                <td>{$li.name}</td>
-                <td>{$li.address}</td>
-                <td>{$li.linkman}</td>
+                <td>{$li.pay_order_sn}</td>
+                <td>{$li.trans_id}</td>
+                <td>￥：{$li.pay_price}</td>
                 <td>{$li.linktel}</td>
+                <td>{$li.name}</td>
                 <td>
-                    {if $li['vip'] == 1}
-                    <i class="Hui-iconfont" style="color:gold;cursor: pointer">&#xe6ff;</i>
-                    {else /}
-                    <i class="Hui-iconfont" style="color:lightgrey;cursor: pointer">&#xe6ff;</i>
-                    {/if}
+                    {switch $li['method']}
+                    {case 1}<i class="Hui-iconfont" style="font-size: 20px">&#xe719;</i>{/case}
+                    {case 2}<i class="Hui-iconfont" style="font-size: 20px">&#xe71c;</i>{/case}
+                    {case 3}<i class="Hui-iconfont" style="font-size: 20px">&#xe722;</i>{/case}
+                    {default/}
+                    {/switch}
                 </td>
-                <td>{$li.vip_pv}</td>
-                <td>{$li.create_time|date="Y-m-d h:i:s"}</td>
+                <td>
+                    {switch $li['status']}
+                    {case 0}<span class="label label-defaunt radius">未支付</span>{/case}
+                    {case 1}<span class="label label-success radius">已支付</span>{/case}
+                    {default/}
+                    {/switch}
+                </td>
+                <td>{if $li['pay_time']}{$li.pay_time|date="Y-m-d h:i:s"}{/if}</td>
             </tr>
             {/foreach}
         </form>
 
         <tr>
+            <td class="text-c">平台收益: <strong>￥：{$total_income}元</strong></td>
             <td colspan="11" id="page" class="text-r"></td>
         </tr>
         </tbody>
@@ -73,7 +77,7 @@
 <script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script>
 <script type="text/javascript">
 
-    var url = '{:url("User/userList")}' + '?<?php echo $page["query"];?>';
+    var url = '{:url("User/rechargeList")}' + '?<?php echo $page["query"];?>';
     var curr = '{$page.curr}',totalPage='{$page.totalPage}';
     if(totalPage > 1) {
         laypage({
@@ -105,7 +109,7 @@
         if(search.length != '') {
             str += '&search=' + search
         }
-        window.location.href = '{:url("User/userList")}' + '?' + str;
+        window.location.href = '{:url("User/rechargeList")}' + '?' + str;
     });
 
 

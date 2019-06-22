@@ -47,7 +47,7 @@ class User extends Base {
             $page['curr'] = $curr_page;
             $page['totalPage'] = ceil($count/$perpage);
             $list = Db::table('mp_user')->alias('u')
-                ->join('mp_userinfo i','u.id=i.uid')
+                ->join('mp_userinfo i','u.id=i.uid','left')
                 ->field('u.*,i.name,i.address,i.linkman,i.linktel,i.busine')
                 ->where($where)->limit(($curr_page - 1)*$perpage,$perpage)->select();
         } catch(\Exception $e) {
@@ -110,6 +110,60 @@ class User extends Base {
 
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
+    }
+
+
+    public function rechargeList() {
+        $param['status'] = input('param.status','');
+        $param['logmin'] = input('param.logmin');
+        $param['logmax'] = input('param.logmax');
+        $param['search'] = input('param.search');
+
+        $page['query'] = http_build_query(input('param.'));
+
+        $curr_page = input('param.page',1);
+        $perpage = input('param.perpage',10);
+
+        $where = [];
+
+        $where[] = ['o.status','=',1];
+
+//        if(!is_null($param['status']) && $param['status'] !== '') {
+//            $where[] = ['o.status','=',$param['status']];
+//        }
+
+        if($param['logmin']) {
+            $where[] = ['o.pay_time','>=',strtotime(date('Y-m-d 00:00:00',strtotime($param['logmin'])))];
+        }
+
+        if($param['logmax']) {
+            $where[] = ['o.pay_time','<=',strtotime(date('Y-m-d 23:59:59',strtotime($param['logmax'])))];
+        }
+
+        if($param['search']) {
+            $where[] = ['o.pay_order_sn','like',"%{$param['search']}%"];
+        }
+
+
+        try {
+            $total_income = Db::table('mp_vip_order')->alias('o')->where($where)->sum('o.pay_price');
+            $count = Db::table('mp_vip_order')->alias('o')->where($where)->count();
+            $page['count'] = $count;
+            $page['curr'] = $curr_page;
+            $page['totalPage'] = ceil($count/$perpage);
+            $list = Db::table('mp_vip_order')->alias('o')
+                ->join('mp_userinfo i','o.uid=i.uid')
+                ->field('o.*,i.linktel,i.name')
+                ->where($where)->limit(($curr_page - 1)*$perpage,$perpage)->select();
+        } catch(\Exception $e) {
+            die($e->getMessage());
+        }
+
+        $this->assign('list',$list);
+        $this->assign('page',$page);
+//        $this->assign('status',$param['status']);
+        $this->assign('total_income',$total_income);
+        return $this->fetch();
     }
 
 

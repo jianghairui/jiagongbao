@@ -104,12 +104,12 @@ class Pay extends Common {
                         if($user['vip_time'] > time()) {
                             $update_user = [
                                 'vip' => 1,
-                                'vip_time' => $user['vip_time'] + $exist['vip_days']
+                                'vip_time' => $user['vip_time'] + $exist['vip_days']*24*3600
                             ];
                         }else {
                             $update_user = [
                                 'vip' => 1,
-                                'vip_time' => time() + $exist['vip_days']
+                                'vip_time' => time() + $exist['vip_days']*24*3600
                             ];
                         }
                         Db::table('mp_user')->where('id','=',$exist['uid'])->update($update_user);
@@ -156,7 +156,7 @@ class Pay extends Common {
 //生成随机订单号
             $request = new \AlipayTradeAppPayRequest();
 
-            $total_amount = 0.12;
+            $total_amount = 0.01;
             $out_trade_no = $val['pay_order_sn'];
 //异步地址传值方式
             $request->setNotifyUrl("http://j.jianghairui.com/api/pay/aliPayNotify");
@@ -203,12 +203,12 @@ class Pay extends Common {
                         if($user['vip_time'] > time()) {
                             $update_user = [
                                 'vip' => 1,
-                                'vip_time' => $user['vip_time'] + $exist['vip_days']
+                                'vip_time' => $user['vip_time'] + $exist['vip_days']*24*3600
                             ];
                         }else {
                             $update_user = [
                                 'vip' => 1,
-                                'vip_time' => time() + $exist['vip_days']
+                                'vip_time' => time() + $exist['vip_days']*24*3600
                             ];
                         }
                         Db::table('mp_user')->where('id','=',$exist['uid'])->update($update_user);

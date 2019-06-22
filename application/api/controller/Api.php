@@ -280,6 +280,9 @@ class Api extends Common {
         return ajax($list);
     }
 
+
+
+
 //    public function getCitylist() {
 //        try {
 //            $citylist = Db::table('mp_city')->select();

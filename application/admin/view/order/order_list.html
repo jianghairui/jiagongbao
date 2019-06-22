@@ -3,9 +3,59 @@
     <section id="formAjax">
         <div class="text-c">
             <button onclick="removeIframe()" class="btn btn-primary radius">关闭选项卡</button>
-            <input type="text" name="search" value="{$Think.get.search}" id="search" placeholder=" 订单名" style="width:250px" class="input-text">
+            发布时间：
+            <input type="text" onfocus="WdatePicker({ maxDate:'#F{ $dp.$D(\'logmax\')||\'%y-%M-%d\' }' })" id="logmin" value="{$Think.get.logmin}" class="input-text Wdate" style="width:120px;">
+            -
+            <input type="text" onfocus="WdatePicker({ minDate:'#F{ $dp.$D(\'logmin\') }' })" id="logmax" value="{$Think.get.logmax}" class="input-text Wdate" style="width:120px;">
+
+            <input type="text" name="search" value="{$Think.get.search}" id="search" placeholder=" 订单名或手机号或公司名称" style="width:250px" class="input-text">
             <button name="" id="search-btn" class="btn btn-success" type="button"><i class="Hui-iconfont">&#xe665;</i> 查找订单</button>
+            <span class="select-box inline" style="width: 100px;">
+                <select name="status" id="status" class="select">
+                    <option value="" {if $param['status'] === ''}selected{/if}>全部(状态)</option>
+                    <option value="0" {if $param['status'] === '0'}selected{/if}>审核中</option>
+                    <option value="1" {if $param['status'] === '1'}selected{/if}>已通过</option>
+                    <option value="2" {if $param['status'] === '2'}selected{/if}>未通过</option>
+                </select>
+            </span>
+            <button class="btn btn-toolbar" id="toexcel" type="button"><i class="Hui-iconfont">&#xe634;</i> 导出Excel</button>
+
         </div>
+        <div class="text-c" style="margin-top: 15px">
+            <span class="select-box inline" style="width: 150px;">
+				<select class="select" name="cate_id" id="cate_id">
+                    <option value="">全部(分类)</option>
+                    {foreach $cate_list as $li}
+					<option value="{$li.id}" {if $param['cate_id']==$li['id']}selected{/if}>{$li.cate_name}</option>
+                    {/foreach}
+				</select>
+            </span>
+            <span class="select-box inline" style="width: 150px;">
+				<select class="select" name="provinceCode" id="provinceCode">
+                    <option value="">全部(省/自治区)</option>
+                    {foreach $province_list as $li}
+					<option value="{$li.code}" {if $param['provinceCode']==$li['code']}selected{/if}>{$li.name}</option>
+                    {/foreach}
+				</select>
+            </span>
+            <span class="select-box inline" style="width: 200px;">
+				<select class="select" name="cityCode" id="cityCode">
+                    <option value="">全部(市)</option>
+                    {foreach $city_list as $li}
+					<option value="{$li.code}" {if $param['cityCode']==$li['code']}selected{/if}>{$li.name}</option>
+                    {/foreach}
+				</select>
+            </span>
+            <span class="select-box inline" style="width: 200px;">
+				<select class="select" name="regionCode" id="regionCode">
+                    <option value="">全部(区/县)</option>
+                    {foreach $region_list as $li}
+					<option value="{$li.code}" {if $param['regionCode']==$li['code']}selected{/if}>{$li.name}</option>
+                    {/foreach}
+				</select>
+            </span>
+        </div>
+
     </section>
     <div class="cl pd-5 bg-1 bk-gray mt-20">
         <span class="l">
@@ -22,7 +72,7 @@
             <th width="120">地区</th>
             <th width="80">数量</th>
             <th width="100">材质</th>
-            <th width="120">订单状态</th>
+            <th width="120">审核状态</th>
             <th width="120">发布时间</th>
             <th width="100">操作</th>
         </tr>
@@ -40,13 +90,26 @@
                 <td>{$li.address}</td>
                 <td>{$li.num}</td>
                 <td>{$li.material}</td>
-                <td>{$li.status}</td>
+                <td class="td-status">
+                    {switch $li['status']}
+                    {case 0}
+                    <a class="btn btn-link radius" style="text-decoration:none;" onClick="order_shenhe(this,{$li.id})" href="javascript:;" title="审核">审核</a>
+                    {/case}
+                    {case 1}
+                    <span class="label label-success radius">已通过</span>
+                    {/case}
+                    {case 2}
+                    <span class="label label-defaunt radius">未通过</span>
+                    {/case}
+                    {default /}{$li['status']}
+                    {/switch}
+                </td>
                 <td>{$li.create_time|date="Y-m-d H:i:s"}</td>
                 <td class="td-manage" rowspan="3">
                     <a style="text-decoration:none" onclick="add_info('订单信息','{:url("Order/orderDetail",array("id"=>$li["id"]))}')" class="ml-5" href="javascript:;" title="查看订单">
                     <i class="Hui-iconfont">&#xe6df;</i>
                     </a>
-                    <a style="text-decoration:none" class="ml-5" onClick="course_del(this,{$li['id']})" href="javascript:;" title="删除">
+                    <a style="text-decoration:none" class="ml-5" onClick="order_del(this,{$li['id']})" href="javascript:;" title="删除">
                         <i class="Hui-iconfont">&#xe6e2;</i>
                     </a>
                 </td>
@@ -103,12 +166,79 @@
 
 
     $("#search-btn").click(function () {
+        var logmin = $("#formAjax").find("#logmin").val();
+        var logmax = $("#formAjax").find("#logmax").val();
         var search = $("#formAjax").find("#search").val();
+        var status = $("#formAjax").find("#status").val();
+
+        var cate_id = $("#formAjax").find("#cate_id").val();
+        var provinceCode = $("#formAjax").find("#provinceCode").val();
+        var cityCode = $("#formAjax").find("#cityCode").val();
+        var regionCode = $("#formAjax").find("#regionCode").val();
         var str = '';
+        if(logmin.length != '') {
+            str += 'logmin=' + logmin;
+        }
+        if(logmax.length != '') {
+            str += '&logmax=' + logmax;
+        }
         if(search.length != '') {
-            str += 'search=' + search;
+            str += '&search=' + search;
+        }
+        if(status.length != '') {
+            str += '&status=' + status;
+        }
+        if(cate_id.length != '') {
+            str += '&cate_id=' + cate_id;
+        }
+        if(provinceCode.length != '') {
+            str += '&provinceCode=' + provinceCode;
+        }
+        if(cityCode.length != '') {
+            str += '&cityCode=' + cityCode;
+        }
+        if(regionCode.length != '') {
+            str += '&regionCode=' + regionCode;
         }
         window.location.href = '{:url("Order/orderList")}' + '?' + str;
+    });
+
+    $("#toexcel").click(function () {
+        var logmin = $("#formAjax").find("#logmin").val();
+        var logmax = $("#formAjax").find("#logmax").val();
+        var search = $("#formAjax").find("#search").val();
+        var status = $("#formAjax").find("#status").val();
+
+        var cate_id = $("#formAjax").find("#cate_id").val();
+        var provinceCode = $("#formAjax").find("#provinceCode").val();
+        var cityCode = $("#formAjax").find("#cityCode").val();
+        var regionCode = $("#formAjax").find("#regionCode").val();
+        var str = '';
+        if(logmin.length != '') {
+            str += 'logmin=' + logmin;
+        }
+        if(logmax.length != '') {
+            str += '&logmax=' + logmax;
+        }
+        if(search.length != '') {
+            str += '&search=' + search;
+        }
+        if(status.length != '') {
+            str += '&status=' + status;
+        }
+        if(cate_id.length != '') {
+            str += '&cate_id=' + cate_id;
+        }
+        if(provinceCode.length != '') {
+            str += '&provinceCode=' + provinceCode;
+        }
+        if(cityCode.length != '') {
+            str += '&cityCode=' + cityCode;
+        }
+        if(regionCode.length != '') {
+            str += '&regionCode=' + regionCode;
+        }
+        window.location.href = '{:url("Excel/orderList")}' + '?' + str;
     });
 
     /*添加订单*/
@@ -121,8 +251,83 @@
         layer.full(index);
     }
 
+
+    var click_lock = true;
+    /*笔记审核*/
+    function order_shenhe(obj,id){
+        layer.confirm('通过审核？', {
+                btn: ['确定','拒绝','取消'],
+                shade: false,
+                closeBtn: 0
+            },
+            function(){
+                if(click_lock) {
+                    click_lock = false;
+                    $.ajax({
+                        url:"{:url('Order/orderPass')}",
+                        type:'post',
+                        dataType:'json',
+                        data:{id:id},
+                        success:function(data) {
+                            console.log(data);
+                            if(data.code == 1) {
+                                $(obj).parent().html('<span class="label label-success radius">已通过</span>');
+                                layer.msg('已审核', {icon:1,time:1000});
+                                click_lock = true;
+                            }else {
+                                layer.msg(data.data,{icon:2,time:1000})
+                                click_lock = true;
+                            }
+                        },
+                        error:function(data) {
+                            layer.msg('请求失败!',{icon:5,time:1000})
+                            click_lock = true;
+                        }
+                    })
+                }
+
+            },
+            function(){
+                layer.prompt({
+                    formType: 2,
+                    value: '内容违规',
+                    title: '请输入理由(最多50个字)',
+                    maxlength:50,
+                    area: ['400px', '300px'] //自定义文本域宽高
+                }, function(value, index, elem){
+                    reason = value;
+                    layer.close(index);
+                    if(click_lock) {
+                        click_lock = false
+                        $.ajax({
+                            url:"{:url('Order/orderReject')}",
+                            type:'post',
+                            dataType:'json',
+                            data:{id:id,reason:reason},
+                            success:function(data) {
+                                console.log(data)
+                                if(data.code == 1) {
+                                    $(obj).parent().html('<span class="label label-defaunt radius">未通过</span>');
+                                    layer.msg('未通过', {icon:1,time:1000});
+                                    click_lock = true
+                                }else {
+                                    layer.msg(data.data,{icon:2,time:1000})
+                                }
+                                click_lock = true
+                            },
+                            error:function(data) {
+                                layer.msg('请求失败!',{icon:5,time:1000})
+                                click_lock = true
+                            }
+                        })
+                    }
+                });
+
+            })
+    }
+
     /*订单-删除*/
-    function course_del(obj,id){
+    function order_del(obj,id){
         layer.confirm('确认要删除吗？',function(index){
             $.ajax({
                 url: "{:url('Order/orderDel')}",
@@ -132,6 +337,8 @@
                 success: function(data){
                     console.log(data)
                     if(data.code == 1) {
+                        $(obj).parents("tr").next().next().remove();
+                        $(obj).parents("tr").next().remove();
                         $(obj).parents("tr").remove();
                         layer.msg('已删除!',{icon:1,time:1000});
                     }else {
@@ -143,6 +350,86 @@
                 }
             });
         });
+    }
+
+
+    $("#provinceCode").change(function () {
+        var provinceCode = $(this).val();
+        if(click_lock) {
+            click_lock = false;
+            getCityList(provinceCode);
+        }
+
+    });
+
+
+    $("#cityCode").change(function () {
+        var cityCode = $(this).val();
+        if(click_lock) {
+            click_lock = false;
+            getRegionList(cityCode);
+        }
+
+    });
+
+    function getCityList(provinceCode) {
+        $.ajax({
+            url: "{:url('Order/getCityList')}" ,
+            type: 'post',
+            data:{provinceCode:provinceCode},
+            success: function(data){
+                console.log(data);
+                if(data.code == 1) {
+                    var html = '<option value="">全部(市)</option>',list = data.data;
+                    if(list.length > 0) {
+                        for(var i=0; i <list.length;i++) {
+                            html += '<option value="'+list[i].code+'">'+list[i].name+'</option>';
+                        }
+                    }
+                    $("#cityCode").html(html);
+                    if(list.length > 0) {
+                        getRegionList(list[0].code);
+                    }
+                }else {
+                    layer.msg('接口异常',{icon:5,time:1000});
+                }
+                click_lock = true;
+                console.log(data)
+            },
+            error: function(res){
+                layer.msg('接口请求失败!',{icon:5,time:1000});
+                click_lock = true;
+
+            }
+        })
+    }
+
+    function getRegionList(cityCode) {
+        $.ajax({
+            url: "{:url('Order/getRegionList')}" ,
+            type: 'post',
+            data:{cityCode:cityCode},
+            success: function(data){
+                if(data.code == 1) {
+                    var html = '<option value="">全部(区/县)</option>',list = data.data;
+                    if(list.length > 0) {
+                        for(var i=0; i <list.length;i++) {
+                            html += '<option value="'+list[i].code+'">'+list[i].name+'</option>';
+                        }
+                    }
+                    $("#regionCode").html(html);
+                }else {
+                    layer.msg('接口异常',{icon:5,time:1000});
+                }
+                click_lock = true;
+                console.log(data)
+            },
+            error: function(res){
+                layer.msg('接口请求失败!',{icon:5,time:1000});
+                click_lock = true;
+
+            }
+        })
     }
 
 </script>
