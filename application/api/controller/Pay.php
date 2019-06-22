@@ -21,7 +21,8 @@ class Pay extends Common {
         try {
             $where = [
                 ['pay_order_sn','=',$val['pay_order_sn']],
-                ['status','=',0]
+                ['status','=',0],
+                ['uid','=',$this->myinfo['id']]
             ];
             $exist = Db::table('mp_vip_order')->where($where)->find();
             if(!$exist) {
@@ -98,7 +99,20 @@ class Pay extends Common {
                             'trans_id' => $data['transaction_id']
                         ];
                         Db::table('mp_vip_order')->where($map)->update($update_data);
-                        Db::table('mp_user')->where('id','=',$exist['uid'])->setInc('vip_time',$exist['vip_days']);
+
+                        $user = Db::table('mp_user')->where('id','=',$exist['uid'])->find();
+                        if($user['vip_time'] > time()) {
+                            $update_user = [
+                                'vip' => 1,
+                                'vip_time' => $user['vip_time'] + $exist['vip_days']
+                            ];
+                        }else {
+                            $update_user = [
+                                'vip' => 1,
+                                'vip_time' => time() + $exist['vip_days']
+                            ];
+                        }
+                        Db::table('mp_user')->where('id','=',$exist['uid'])->update($update_user);
                     }else {
                         $this->paylog($this->cmd,'未找到订单');
                     }
@@ -118,7 +132,8 @@ class Pay extends Common {
         try {
             $where = [
                 ['pay_order_sn','=',$val['pay_order_sn']],
-                ['status','=',0]
+                ['status','=',0],
+                ['uid','=',$this->myinfo['id']]
             ];
             $exist = Db::table('mp_vip_order')->where($where)->find();
             if(!$exist) {
@@ -128,26 +143,31 @@ class Pay extends Common {
             return ajax($e->getMessage(),-1);
         }
 
-        $aop = new \AopClient ();
-        $aop->gatewayUrl = 'https://openapi.alipay.com/gateway.do';
-        $aop->appId = config('alipay_appid');
-        $aop->rsaPrivateKey = config('alipay_rsaPrivateKey');
-        $aop->alipayrsaPublicKey=config('alipay_alipayrsaPublicKey');
-        $aop->apiVersion = '1.0';
-        $aop->postCharset='utf-8';
-        $aop->format='json';
-        $aop->signType = 'RSA2';
+        try {
+            $aop = new \AopClient ();
+            $aop->gatewayUrl = 'https://openapi.alipay.com/gateway.do';
+            $aop->appId = config('alipay_appid');
+            $aop->rsaPrivateKey = config('alipay_rsaPrivateKey');
+            $aop->alipayrsaPublicKey=config('alipay_alipayrsaPublicKey');
+            $aop->apiVersion = '1.0';
+            $aop->postCharset='utf-8';
+            $aop->format='json';
+            $aop->signType = 'RSA2';
 //生成随机订单号
-        $date=date("YmdHis");
-        $request = new \AlipayTradeAppPayRequest();
+            $request = new \AlipayTradeAppPayRequest();
+
+            $total_amount = 0.12;
+            $out_trade_no = $val['pay_order_sn'];
 //异步地址传值方式
-        $request->setNotifyUrl("http://j.jianghairui.com/api/pay/aliPayNotify");
-        $request->setBizContent("{\"out_trade_no\":\"".$date.mt_rand(1000,9999)."\",\"total_amount\":0.01,\"product_code\":\"QUICK_MSECURITY_PAY\",\"subject\":\"加工宝会员充值\"}");
-        $result = $aop->sdkExecute($request);
-        exit(htmlspecialchars($result));
+            $request->setNotifyUrl("http://j.jianghairui.com/api/pay/aliPayNotify");
+            $request->setBizContent("{\"out_trade_no\":\"".$out_trade_no."\",\"total_amount\":".$total_amount.",\"product_code\":\"QUICK_MSECURITY_PAY\",\"subject\":\"加工宝会员充值\"}");
+            $result = $aop->sdkExecute($request);
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
 
-
-
+//        exit(htmlspecialchars($result));
+        return ajax($result);
 
     }
 
@@ -157,34 +177,64 @@ class Pay extends Common {
 
         $result = $aop->rsaCheckV1($_POST,NULL,$_POST['sign_type']);
 
-        $this->paylog('notify',var_export($_REQUEST,true));
+        $this->paylog($this->cmd,var_export($_REQUEST,true));
 
         if($result) {
             /*业务逻辑代码*/
             if($_POST['trade_status'] == 'TRADE_SUCCESS' ){
                 //业务处理
+                $pay_order_sn = $_POST['out_trade_no'];
+                $map = [
+                    ['pay_order_sn','=',$pay_order_sn],
+                    ['status','=',0]
+                ];
+                try {
+                    $exist = Db::table('mp_vip_order')->where($map)->find();
+                    if($exist) {
+                        $update_data = [
+                            'status' => 1,
+                            'method' => 2,
+                            'pay_time' => time(),
+                            'trans_id' => $_POST['trade_no']
+                        ];
+                        Db::table('mp_vip_order')->where($map)->update($update_data);
+
+                        $user = Db::table('mp_user')->where('id','=',$exist['uid'])->find();
+                        if($user['vip_time'] > time()) {
+                            $update_user = [
+                                'vip' => 1,
+                                'vip_time' => $user['vip_time'] + $exist['vip_days']
+                            ];
+                        }else {
+                            $update_user = [
+                                'vip' => 1,
+                                'vip_time' => time() + $exist['vip_days']
+                            ];
+                        }
+                        Db::table('mp_user')->where('id','=',$exist['uid'])->update($update_user);
+                    }else {
+                        $this->paylog($this->cmd,'订单不存在');
+                    }
+                }catch (\Exception $e) {
+                    $this->excep($this->cmd,$e->getMessage());
+                }
                 exit('success');
 
             }else{
                 exit('fail');
             }
         }else {
-            $this->paylog('notify','rsaCheckV1 failed');
+            $this->paylog($this->cmd,'rsaCheckV1 failed');
         }
+
     }
 
 
 
-    //支付回调日志
-    protected function paylog($cmd,$str) {
-        $file= ROOT_PATH . '/notify.txt';
-        $text='[Time ' . date('Y-m-d H:i:s') ."]\ncmd:" .$cmd. "\n" .$str. "\n---END---" . "\n";
-        if(false !== fopen($file,'a+')){
-            file_put_contents($file,$text,FILE_APPEND);
-        }else{
-            echo '创建失败';
-        }
-    }
+
+
+
+
 
 
 }

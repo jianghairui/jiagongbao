@@ -39,6 +39,8 @@ class Common extends Controller {
             'Api/getprovincelist',
             'Api/getcitylist',
             'Api/getregionlist',
+            'Pay/wxpaynotify',
+            'Pay/alipaynotify',
 
         ];
         if (in_array($this->cmd, $noneed)) {

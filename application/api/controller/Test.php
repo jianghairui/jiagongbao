@@ -31,5 +31,15 @@ class Test extends Controller {
 //        }
     }
 
+    public function index() {
+        try {
+            $arr = [];
+            $a = $arr['name'];
+        } catch(\Exception $e) {
+            echo 'LALLALA<br>';
+        }
+        echo 'I AM OK';
+    }
+
 
 }
