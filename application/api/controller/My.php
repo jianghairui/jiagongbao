@@ -174,7 +174,7 @@ class My extends Common {
             ];
             $order_exist = Db::table('mp_order')
                 ->where($whereOrder)
-                ->field("id,title,address,cate_ids,material,num,end_time,desc,pics,file_path,compname,linkman,linktel")->find();
+                ->field("id,title,address,cate_ids,material,num,end_time,desc,pics,file_path,compname,linkman,linktel,status")->find();
             if(!$order_exist) {
                 return ajax('非法参数',-4);
             }
@@ -319,9 +319,37 @@ class My extends Common {
         return ajax($order_exist);
     }
 
-    //收藏订单
+    //我的收藏订单列表
     public function myCollectList() {
-
+        $curr_page = input('post.page',1);
+        $perpage = input('post.perpage',15);
+        $order = ['id'=>'DESC'];
+        try {
+            $whereCollect = [
+                ['uid','=',$this->myinfo['id']]
+            ];
+            $collect_orderids = Db::table('mp_collect')->where($whereCollect)->column('order_id');
+            if(empty($collect_orderids)) {
+                return ajax([]);
+            }
+            $where = [
+                ['status','=',1],
+                ['del','=',0],
+                ['id','in',$collect_orderids]
+            ];
+            $list = Db::table('mp_order')
+                ->where($where)
+                ->limit(($curr_page-1)*$perpage,$perpage)
+                ->order($order)
+                ->field('id,pics,title,address,num,create_time')->select();
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        foreach ($list as &$v) {
+            $v['pics'] = unserialize($v['pics'])[0];
+            $v['create_time'] = date('Y-m-d',$v['create_time']);
+        }
+        return ajax($list);
     }
 
     //充值VIP下单

@@ -114,11 +114,13 @@ class Login extends Common {
                 ];
                 Db::table('mp_user')->where($whereUser)->update($update_data);
             }else {
+                $setting = $this->getSetting();
                 $token = md5($val['tel'] . time());
                 $insert_data = [
                     'tel' => $val['tel'],
                     'create_time' => time(),
                     'last_login_time' => time(),
+                    'free_times' => $setting['free_chance'],
                     'token' => $token
                 ];
                 Db::table('mp_user')->insert($insert_data);

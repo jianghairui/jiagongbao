@@ -68,6 +68,16 @@ class Common extends Controller {
 
     }
 
+    //获取设置参数
+    protected function getSetting() {
+        try {
+            $info = Db::table('mp_setting')->where('id','=',1)->find();
+        } catch(\Exception $e) {
+            throw new HttpResponseException(ajax($e->getMessage(),-1));
+        }
+        return $info;
+    }
+
     //Exception日志
     protected function excep($cmd,$str) {
         $file= ROOT_PATH . '/exception.txt';

@@ -136,7 +136,7 @@ class Api extends Common {
             ];
             $order_exist = Db::table('mp_order')
                 ->where($whereOrder)
-                ->field("id,title,address,cate_ids,material,num,end_time,desc,pics,file_path,compname,linkman,linktel,create_time")->find();
+                ->field("id,title,address,cate_ids,material,num,end_time,desc,pics,file_path,compname,linkman,linktel,create_time,status")->find();
             if(!$order_exist) {
                 return ajax('非法参数',-4);
             }
@@ -186,6 +186,32 @@ class Api extends Common {
 
         }
         return ajax($order_exist);
+    }
+
+
+    //收藏订单
+    public function orderCollect() {
+        $val['order_id'] = input('post.order_id');
+        checkPost($val);
+        try {
+            $where = [
+                ['order_id','=',$val['order_id']],
+                ['uid','=',$this->myinfo['id']]
+            ];
+            $collect = Db::table('mp_collect')->where($where)->find();
+            if($collect) {
+                return ajax('已收藏',55);
+            }
+            $insert_data = [
+                'uid' => $this->myinfo['id'],
+                'order_id' => $val['order_id'],
+                'create_time' => time()
+            ];
+            Db::table('mp_collect')->insert($insert_data);
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax();
     }
 
     //立即报价
@@ -326,6 +352,29 @@ class Api extends Common {
 //        }
 //        return $arr;
 //    }
+
+    //检测是否收藏订单
+//    public function checkCollect() {
+//        $val['order_id'] = input('post.order_id');
+//        checkPost($val);
+//        try {
+//            $where = [
+//                ['order_id','=',$val['order_id']],
+//                ['uid','=',$this->myinfo['id']]
+//            ];
+//            $collect = Db::table('mp_collect')->where($where)->find();
+//            if($collect) {
+//                return ajax(true);
+//            }else {
+//                return ajax(false);
+//            }
+//
+//        } catch(\Exception $e) {
+//            return ajax($e->getMessage(),-1);
+//        }
+//    }
+
+
 
 
 

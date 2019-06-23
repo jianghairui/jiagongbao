@@ -7,6 +7,7 @@
  */
 namespace app\admin\controller;
 use think\Controller;
+use think\Db;
 use my\Auth;
 use think\exception\HttpResponseException;
 class Base extends Controller {
@@ -54,6 +55,16 @@ class Base extends Controller {
                 return false;
             }
         }
+    }
+
+    //获取设置参数
+    protected function getSetting() {
+        try {
+            $info = Db::table('mp_setting')->where('id','=',1)->find();
+        } catch(\Exception $e) {
+            throw new HttpResponseException(ajax($e->getMessage(),-1));
+        }
+        return $info;
     }
 
     protected function excep($cmd = '',$msg = '') {

@@ -90,7 +90,8 @@ class User extends Base {
         $user['create_time'] = time();
 
         try {
-            $user['free_times'] = Db::table('mp_setting')->where('id','=',1)->value('free_chance');
+            $setting = $this->getSetting();
+            $user['free_times'] = $setting['free_chance'];
             $whereUser = [
                 ['tel','=',$user['tel']]
             ];
