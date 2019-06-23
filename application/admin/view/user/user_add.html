@@ -1,0 +1,158 @@
+<article class="page-container">
+    <form class="form form-horizontal" id="form-admin-add">
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>账号：</label>
+            <div class="formControls col-xs-7 col-sm-7">
+                <input type="text" class="input-text" value="" placeholder="设置登陆账号(手机号)" id="tel" name="tel" maxlength="11">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>初始密码：</label>
+            <div class="formControls col-xs-7 col-sm-7">
+                <input type="password" class="input-text" autocomplete="off" value="" placeholder="密码" id="password" name="password" maxlength="32">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>确认密码：</label>
+            <div class="formControls col-xs-7 col-sm-7">
+                <input type="password" class="input-text" autocomplete="off"  placeholder="确认新密码" id="password2" name="password2" maxlength="32">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>会员到期时间：</label>
+            <div class="formControls col-xs-4 col-sm-4">
+                <input type="text" name="vip_time" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" id="vip_time" value="" class="input-text Wdate" readonly>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>状态：</label>
+            <div class="formControls col-xs-7 col-sm-7 skin-minimal">
+                <div class="radio-box">
+                    <input name="status" type="radio" id="sex-1" value="1" checked>
+                    <label for="sex-1">正常</label>
+                </div>
+                <div class="radio-box">
+                    <input name="status" type="radio" id="sex-2" value="2">
+                    <label for="sex-2">拉黑</label>
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>企业名：</label>
+            <div class="formControls col-xs-5 col-sm-5">
+                <input type="text" class="input-text" value="" placeholder="" id="name" name="name" maxlength="20">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>负责人：</label>
+            <div class="formControls col-xs-5 col-sm-5">
+                <input type="text" class="input-text" placeholder="" name="linkman" id="linkman" maxlength="20">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>联系电话：</label>
+            <div class="formControls col-xs-5 col-sm-5">
+                <input type="text" class="input-text" value="" placeholder="" id="linktel" name="linktel" maxlength="15">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>企业地址：</label>
+            <div class="formControls col-xs-7 col-sm-7">
+                <input type="text" class="input-text" value="" placeholder="" id="address" name="address" maxlength="255">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2">经营类目：</label>
+            <div class="formControls col-xs-7 col-sm-7">
+                <textarea name="busine" cols="" rows="" class="textarea" maxlength="200" placeholder="经营范围" oninput="this.value.length<=200?$('#textlen1').text(this.value.length):$('#textlen1').text(200)" ></textarea>
+                <p class="textarea-numberbar"><em class="textarea-length" id="textlen1">0</em>/200</p>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button class="btn btn-primary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 添加</button>
+                <button onClick="layer_close();" class="btn btn-default radius" type="button">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+            </div>
+        </div>
+    </form>
+</article>
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+
+    $(function(){
+        var isclick = true;
+
+        $('.skin-minimal input').iCheck({
+            checkboxClass: 'icheckbox-blue',
+            radioClass: 'iradio-blue',
+            increaseArea: '20%'
+        });
+
+        $("#form-admin-add").validate({
+            rules:{
+                tel:{
+                    required:true,
+                    isMobile:true
+                },
+                password:{
+                    required:true,
+                },
+                password2:{
+                    required:true,
+                    equalTo: "#password"
+                },
+                status:{
+                    required:true,
+                },
+                name:{
+                    required:true,
+                },
+                linkman:{
+                    required:true,
+                },
+                linktel:{
+                    required:true,
+                },
+                address:{
+                    required:true,
+                },
+                busine:{
+                    required:true,
+                }
+            },
+            focusCleanup:true,
+            success:"valid",
+            submitHandler:function(form){
+                if(isclick) {
+                    isclick = false
+                    $(form).ajaxSubmit({
+                        type: 'post',
+                        url: "{:url('User/userAddPost')}" ,
+                        success: function(data){
+                            console.log(data)
+                            if(data.code == 1) {
+                                layer.msg('添加成功!',{icon:1,time:1000},function(){
+                                    window.parent.location.reload();
+                                });
+                            }else {
+                                layer.msg(data.data,{icon:2,time:1000});
+                                isclick = true
+                            }
+                        },
+                        error: function(XmlHttpRequest, textStatus, errorThrown){
+                            layer.msg('接口请求失败!',{icon:2,time:1000});
+                            isclick = true
+                        }
+                    });
+
+                }
+
+            }
+        });
+    });
+</script>

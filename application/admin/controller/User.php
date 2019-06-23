@@ -23,7 +23,9 @@ class User extends Base {
         $curr_page = input('param.page',1);
         $perpage = input('param.perpage',10);
 
-        $where = [];
+        $where = [
+            ['u.del','=',0]
+        ];
 
         if(!is_null($param['status']) && $param['status'] !== '') {
             $where[] = ['u.status','=',$param['status']];
@@ -49,7 +51,7 @@ class User extends Base {
             $list = Db::table('mp_user')->alias('u')
                 ->join('mp_userinfo i','u.id=i.uid','left')
                 ->field('u.*,i.name,i.address,i.linkman,i.linktel,i.busine')
-                ->where($where)->limit(($curr_page - 1)*$perpage,$perpage)->select();
+                ->where($where)->limit(($curr_page - 1)*$perpage,$perpage)->order(['u.id'=>'DESC'])->select();
         } catch(\Exception $e) {
             die($e->getMessage());
         }
@@ -60,12 +62,143 @@ class User extends Base {
         return $this->fetch();
     }
 
-    public function userDetail() {
+    public function userAdd() {
+        return $this->fetch();
+    }
 
+    public function userAddPost() {
+        $user['tel'] = input('post.tel');
+        $user['password'] = input('post.password');
+        $user['status'] = input('post.status');
+        $info['name'] = input('post.name');
+        $info['linkman'] = input('post.linkman');
+        $info['linktel'] = input('post.linktel');
+        $info['address'] = input('post.address');
+        $info['busine'] = input('post.busine');
+        checkInput($user);
+        checkInput($info);
+        $user['vip_time'] = input('post.vip_time',0);
+
+        if(!is_tel($user['tel']) || !is_tel($info['linktel'])) {
+            return ajax('无效的手机号',-1);
+        }
+        $user['password'] = md5($user['password'] . config('login_key'));
+        if($user['vip_time'] && strtotime($user['vip_time']) > time()) {
+            $user['vip_time'] = strtotime($user['vip_time']);
+            $user['vip'] = 1;
+        }
+        $user['create_time'] = time();
+
+        try {
+            $user['free_times'] = Db::table('mp_setting')->where('id','=',1)->value('free_chance');
+            $whereUser = [
+                ['tel','=',$user['tel']]
+            ];
+            $tel_exist = Db::table('mp_user')->where($whereUser)->find();
+            if($tel_exist) {
+                return ajax('账号已存在,请更换其他手机号',-1);
+            }
+
+            $uid = Db::table('mp_user')->insertGetId($user);
+            $info['uid'] = $uid;
+            $info['create_time'] = time();
+            Db::table('mp_userinfo')->insert($info);
+        }catch (\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax();
+    }
+
+
+    public function userDetail() {
+        $id = input('param.id',0);
+        try {
+            $where = [
+                ['u.id','=',$id]
+            ];
+            $exist = Db::table('mp_user')->alias('u')->join('mp_userinfo i','u.id=i.uid','left')
+                ->where($where)
+                ->find();
+            if(!$exist) {
+                die('非法操作');
+            }
+        } catch(\Exception $e) {
+            die($e->getMessage());
+        }
+        $this->assign('info',$exist);
+        return $this->fetch();
+    }
+
+    public function userMod() {
+        $user['tel'] = input('post.tel');
+        $user['status'] = input('post.status');
+        $user['id'] = input('post.id',0);
+        $info['name'] = input('post.name');
+        $info['linkman'] = input('post.linkman');
+        $info['linktel'] = input('post.linktel');
+        $info['address'] = input('post.address');
+        $info['busine'] = input('post.busine');
+        checkInput($user);
+        checkInput($info);
+        $user['vip_time'] = input('post.vip_time',0);
+        $user['password'] = input('post.password');
+        if(!is_tel($user['tel']) || !is_tel($info['linktel'])) {
+            return ajax('无效的手机号',-1);
+        }
+        if($user['password']) {
+            $user['password'] = md5($user['password'] . config('login_key'));
+        }else {
+            unset($user['password']);
+        }
+        if($user['vip_time'] && strtotime($user['vip_time']) > time()) {
+            $user['vip_time'] = strtotime($user['vip_time']);
+            $user['vip'] = 1;
+        }else {
+            $user['vip_time'] = strtotime($user['vip_time']);
+            $user['vip'] = 0;
+        }
+
+        try {
+            $user_exist = Db::table('mp_user')->where('id','=',$user['id'])->find();
+            if(!$user_exist) {
+                return ajax('非法操作',-1);
+            }
+            $whereUser = [
+                ['tel','=',$user['tel']],
+                ['id','<>',$user['id']]
+            ];
+            $tel_exist = Db::table('mp_user')->where($whereUser)->find();
+            if($tel_exist) {
+                return ajax('账号已存在,请更换其他手机号',-1);
+            }
+
+            Db::table('mp_user')->where('id','=',$user['id'])->update($user);
+            Db::table('mp_userinfo')->where('uid','=',$user['id'])->update($info);
+        }catch (\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax();
     }
 
     public function userDel() {
-
+        $id = input('post.id');
+        try {
+            $where = [
+                ['id','=',$id]
+            ];
+            $exist = Db::table('mp_user')->where($where)->find();
+            if(!$exist) {
+                return ajax('非法操作',-1);
+            }
+            Db::table('mp_user')->where($where)->update(['del'=>1]);
+            $whereOrder = [
+                ['uid','=',$id]
+            ];
+            Db::table('mp_order')->where($whereOrder)->update(['del'=>1]);
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax();
     }
 
     public function userStop() {

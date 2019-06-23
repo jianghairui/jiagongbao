@@ -161,7 +161,6 @@ class My extends Common {
         return ajax($list);
     }
 
-
     //外发订单详情
     public function myOrderDetail() {
         $val['order_id'] = input('post.order_id');

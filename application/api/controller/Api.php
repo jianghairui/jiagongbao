@@ -170,6 +170,21 @@ class Api extends Common {
         } catch(\Exception $e) {
             return ajax($e->getMessage(),-1);
         }
+        if(!$this->myinfo['vip']) {
+            $compname_len = mb_strlen($order_exist['compname'],"utf-8");
+            if($compname_len > 4) {
+                $order_exist['compname'] = mb_substr($order_exist['compname'],0,2,'utf-8') . str_pad('',($compname_len-4),"*") . mb_substr($order_exist['compname'],-2,2,'utf-8');
+            }elseif ($compname_len > 2) {
+                $order_exist['compname'] = mb_substr($order_exist['compname'],0,2,'utf-8') . str_pad('',($compname_len-2),"*");
+            }
+            $order_exist['linktel'] = substr_replace($order_exist['linktel'],'****',3,4);
+
+            $linkman_len = mb_strlen($order_exist['linkman'],"utf-8");
+            if($linkman_len > 1) {
+                $order_exist['linkman'] = mb_substr($order_exist['linkman'],0,1,'utf-8') . str_pad('',($compname_len-1),"*");
+            }
+
+        }
         return ajax($order_exist);
     }
 
@@ -191,6 +206,10 @@ class Api extends Common {
             $order_exist = Db::table('mp_order')->where($where)->find();
             if(!$order_exist) {
                 return ajax('非法参数',-4);
+            }
+
+            if(time() > strtotime($order_exist['end_time'])) {
+                return ajax('订单已失效',54);
             }
             $whereOffer = [
                 ['uid','=',$this->myinfo['id']],
