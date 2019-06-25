@@ -154,7 +154,7 @@ class Login extends Common {
                 if((time() - $exist['create_time']) < 60) {
                     return ajax('1分钟内不可重复发送',11);
                 }
-                $res = $sms->send($param);
+                $res = $sms->send($param,'SMS_168555513');
                 if($res->Code === 'OK') {
                     Db::table('mp_verify')->where('tel',$tel)->update($param);
                     return ajax();

@@ -41,6 +41,8 @@ class Common extends Controller {
             'Api/getregionlist',
             'Pay/wxpaynotify',
             'Pay/alipaynotify',
+            'Qiniu/callback',
+            'Qiniu/getuptoken',
 
         ];
         if (in_array($this->cmd, $noneed)) {
