@@ -101,5 +101,15 @@ class Common extends Controller {
         }
     }
 
+    //七牛云回调日志
+    protected function qiniulog($cmd,$str) {
+        $file= ROOT_PATH . '/qiniu.log';
+        $text='[Time ' . date('Y-m-d H:i:s') ."]\ncmd:" .$cmd. "\n" .$str. "\n---END---" . "\n";
+        if(false !== fopen($file,'a+')){
+            file_put_contents($file,$text,FILE_APPEND);
+        }else{
+            echo '创建失败';
+        }
+    }
 
 }

@@ -12,7 +12,7 @@
 Route::get('think', function () {
     return 'hello,ThinkPHP5!';
 });
-Route::rule('wx', 'admin/api/index');
+Route::rule('callback.php', 'api/qiniu/callBack');
 
 
 return [
