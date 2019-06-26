@@ -114,6 +114,21 @@ class Qiniu extends Common {
 
     }
 
+    public function deleteAfterDays() {
+        $key = 'tmp/1561557108.mp4';
+        $days = 1;
+
+        $auth = new Auth($this->accessKey, $this->secretKey);
+        $config = new Config();
+        $bucketManager = new BucketManager($auth, $config);
+        $err = $bucketManager->deleteAfterDays($this->bucket, $key, $days);
+        if ($err) {
+            halt($err);
+        }else {
+            echo 'SUCCESS';
+        }
+    }
+
 
 
 
