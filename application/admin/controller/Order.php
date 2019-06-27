@@ -8,6 +8,11 @@
 namespace app\admin\controller;
 
 use think\Db;
+require_once ROOT_PATH . '/extend/qiniu/autoload.php';
+use Qiniu\Auth;
+use Qiniu\Config;
+use Qiniu\Storage\BucketManager;
+
 class Order extends Base {
 
     public function orderList() {
@@ -202,6 +207,7 @@ class Order extends Base {
         $val['linkman'] = input('post.linkman');
         checkInput($val);
         $val['cate_ids'] = input('post.cate_ids',[]);
+        $val['file_path'] = input('post.file_path','');
         $images = input('post.pic_url',[]);
         $val['create_time'] = time();
         $val['check_time'] = time();
@@ -239,11 +245,16 @@ class Order extends Base {
             }
             $val['pics'] = serialize($image_array);
 
+            if($val['file_path']) {
+                $val['file_path'] = $this->moveFile($val['file_path']);
+            }
+
             Db::table('mp_order')->insert($val);
         } catch(\Exception $e) {
             foreach ($image_array as $v) {
                 @unlink($v);
             }
+            //todo 删除新附件
             return ajax($e->getMessage(),-1);
         }
         return ajax();
@@ -264,6 +275,7 @@ class Order extends Base {
         $val['id'] = input('post.id');
         checkInput($val);
         $val['cate_ids'] = input('post.cate_ids',[]);
+        $val['file_path'] = input('post.file_path','');
         $images = input('post.pic_url',[]);
         $val['create_time'] = time();
         $val['check_time'] = time();
@@ -309,6 +321,10 @@ class Order extends Base {
             }
             $val['pics'] = serialize($image_array);
 
+            if($val['file_path']) {
+                $val['file_path'] = $this->moveFile($val['file_path']);
+            }
+
             Db::table('mp_order')->where($whereOrder)->update($val);
         } catch(\Exception $e) {
             foreach ($image_array as $v) {
@@ -316,12 +332,18 @@ class Order extends Base {
                     @unlink($v);
                 }
             }
+            if($val['file_path'] !== $order_exist['file_path']) {
+                //todo 删除新附件
+            }
             return ajax($e->getMessage(),-1);
         }
         foreach ($old_pics as $v) {
             if(!in_array($v,$image_array)) {
                 @unlink($v);
             }
+        }
+        if($val['file_path'] !== $order_exist['file_path']) {
+            //todo 删除老附件
         }
         return ajax();
     }
@@ -492,6 +514,32 @@ class Order extends Base {
             return ajax($e->getMessage(),-1);
         }
         return ajax($val);
+    }
+
+
+    //七牛云移动文件
+    private function moveFile($file_path) {
+
+        $key = str_replace('http://' . $this->domain . '/','',$file_path);
+        //todo 判断key是否存在
+
+        $srcBucket = $this->bucket;
+        $destBucket = $this->bucket;
+        $srcKey = $key;
+        $destKey = 'upload/' . explode('/',$key)[1];
+        if($srcKey == $destKey) {
+            return 'http://' . $this->domain . '/' . $destKey;
+        }
+
+        $auth = new Auth($this->accessKey, $this->secretKey);
+        $config = new Config();
+        $bucketManager = new BucketManager($auth, $config);
+        $err = $bucketManager->move($srcBucket, $srcKey, $destBucket, $destKey, true);
+        if($err) {
+            throw new \Exception($err->message());
+        }else {
+            return 'http://' . $this->domain . '/' . $destKey;
+        }
     }
 
 

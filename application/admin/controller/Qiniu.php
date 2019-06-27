@@ -33,12 +33,23 @@ class Qiniu extends Base {
         $auth = new Auth($this->accessKey, $this->secretKey);
         $suffix = input('post.suffix');
 
-        $token = $auth->uploadToken($this->bucket,null,3600);
+        $fkey = create_unique_number('');
+        $filename = 'tmp/' . $fkey . $suffix;
+        $callbackBody = [
+            'fname' => $filename,
+            'fkey' => $fkey,
+            'desc' => '文件描述'
+        ];
+        $policy = [
+            'callbackUrl' => $_SERVER['REQUEST_SCHEME'] . '://'.$_SERVER['HTTP_HOST'].'/callback.php',
+            'callbackBody' => json_encode($callbackBody)
+        ];
+        $token = $auth->uploadToken($this->bucket,null,3600,$policy);
 
         $data = [
             'token' => $token,
             'domain' => $this->domain,
-            'imgUrl' => 'tmp/' . time() . $suffix
+            'filename' => $filename
         ];
         return ajax($data);
     }
@@ -82,13 +93,13 @@ class Qiniu extends Base {
         list($ret, $err) = $bucketManager->listFilesv2($this->bucket, $prefix, $marker, $limit, $delimiter, true);
 
         if ($err) {
-            return ajax($err,-111);
+            halt($err);
         } else {
             foreach ($ret as &$v) {
                 $v = json_decode($v,true);
 //                $v = json_decode($v,true)['item']['key'];
             }
-            return ajax($ret);
+            halt($ret);
         }
     }
 
@@ -98,11 +109,13 @@ class Qiniu extends Base {
         $config = new Config();
         $bucketManager = new BucketManager($auth, $config);
 
-        $key = 'tmp/1561557242.mp4';
+        $file_path = 'http://qiniu.jiagongbao.net/upload/156164908795512100623.exe';
+        $key = str_replace('http://' . $this->domain . '/','',$file_path);
+        //todo 判断key是否存在
         $srcBucket = $this->bucket;
         $destBucket = $this->bucket;
         $srcKey = $key;
-        $destKey = 'upload/1561557242.mp4';
+        $destKey = 'upload/' . explode('/',$key)[1];
         $err = $bucketManager->move($srcBucket, $srcKey, $destBucket, $destKey, true);
 
         if($err) {
