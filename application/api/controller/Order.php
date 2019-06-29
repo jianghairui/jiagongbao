@@ -23,6 +23,7 @@ class Order extends Common {
         $val['linktel'] = input('post.linktel');
         $val['linkman'] = input('post.linkman');
         checkPost($val);
+
         $val['cate_ids'] = input('post.cate_ids',[]);
         $images = input('post.pic_url',[]);
         $val['create_time'] = time();
@@ -39,13 +40,13 @@ class Order extends Common {
             $val['address'] = $province['name'] . '-' . $city['name'] . '-' . $region['name'];
             $val['order_sn'] = create_unique_number('');
 
-            if(empty($val['cate_ids'])) {
+            if(!is_array($val['cate_ids']) || empty($val['cate_ids'])) {
                 return ajax('至少选择一个分类',-1);
             }
 
             $val['cate_ids'] = implode(',',array_unique($val['cate_ids']));
 
-            if(empty($images)) {
+            if(!is_array($images) || empty($images)) {
                 return ajax('至少上传一张图片',-1);
             }
             if(count($images) > 9) {
@@ -53,6 +54,7 @@ class Order extends Common {
             }
 
             $image_array = [];
+
             foreach ($images as $v) {
                 if(!file_exists($v)) {
                     return ajax('请重新上传图片',51);
@@ -60,7 +62,6 @@ class Order extends Common {
                 $image_array[] = rename_file($v);
             }
             $val['pics'] = serialize($image_array);
-
             Db::table('mp_order')->insert($val);
         } catch(\Exception $e) {
             foreach ($image_array as $v) {
