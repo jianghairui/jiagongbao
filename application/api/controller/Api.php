@@ -231,7 +231,7 @@ class Api extends Common {
             ];
             $order_exist = Db::table('mp_order')->where($where)->find();
             if(!$order_exist) {
-                return ajax('非法参数',-4);
+                return ajax('订单不存在或状态已改变',4);
             }
 
             if(time() > strtotime($order_exist['end_time'])) {

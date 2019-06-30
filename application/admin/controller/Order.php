@@ -239,7 +239,7 @@ class Order extends Base {
             $image_array = [];
             foreach ($images as $v) {
                 if(!file_exists($v)) {
-                    return ajax('请重新上传图片',2);
+                    return ajax('请重新上传图片',-1);
                 }
                 $image_array[] = rename_file($v);
             }
@@ -315,7 +315,7 @@ class Order extends Base {
             $image_array = [];
             foreach ($images as $v) {
                 if(!file_exists($v)) {
-                    return ajax('请重新上传图片',2);
+                    return ajax('请重新上传图片',-1);
                 }
                 $image_array[] = rename_file($v);
             }

@@ -57,6 +57,7 @@ class Common extends Controller {
                     ['token','=',$token],
                     ['last_login_time','>',time() - 3600*24*30]
                 ])->find();
+
             }catch (\Exception $e) {
                 throw new HttpResponseException(ajax($e->getMessage(),-1));
             }
