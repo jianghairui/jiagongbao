@@ -412,8 +412,9 @@ class Order extends Base {
         $where = [
             ['del','=',0]
         ];
+        $order = ['sort'=>'ASC'];
         try {
-            $list = Db::table('mp_order_cate')->where($where)->select();
+            $list = Db::table('mp_order_cate')->where($where)->order($order)->select();
         }catch (\Exception $e) {
             die($e->getMessage());
         }
