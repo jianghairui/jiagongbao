@@ -30,6 +30,7 @@ class Order extends Common {
         $val['check_time'] = time();
         $val['status'] = 0;
         $val['uid'] = $this->myinfo['id'];
+
         try {
             $province = Db::table('mp_city')->where('code','=',$val['province_code'])->find();
             $city = Db::table('mp_city')->where('code','=',$val['city_code'])->find();
@@ -69,7 +70,7 @@ class Order extends Common {
             }
             return ajax($e->getMessage(),-1);
         }
-        return ajax();
+        return ajax($val);
     }
 
     public function orderMod() {

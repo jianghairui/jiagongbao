@@ -89,10 +89,10 @@
                 <span id="qiniu-upload" class="btn btn-uploadstar radius ml-10">上传附件</span>
             </label>
             <div class="formControls col-xs-4 col-sm-4">
+                <label for="qiniu-file" class="btn btn-toolbar" style="display: inline-block">选择文件</label>
+                <input id="filename" type="text" class="input-text" value="{$info.file_path}"  style="display: inline-block;width: 200px;" disabled>
                 {if $info['file_path']}
-                <label for="qiniu-file" class="btn btn-toolbar">重新上传</label>
-                {else /}
-                <label for="qiniu-file" class="btn btn-toolbar">选择文件</label>
+                <i class="Hui-iconfont" style="font-size: 20px" title="下载附件"><a href="{$info.file_path}" target="_blank" style="text-decoration: none">&#xe6f1;</a></i>
                 {/if}
             </div>
             <div class="formControls col-xs-4 col-sm-4">
@@ -201,7 +201,7 @@
                         type: 'post',
                         url: "{:url('Order/orderMod')}" ,
                         success: function(data){
-                            console.log(data);isclick=true;return;
+                            // console.log(data);isclick=true;return;
                             if(data.code == 1) {
                                 layer.msg('保存成功!',{icon:1,time:1000},function () {
                                     window.parent.location.reload();
@@ -294,6 +294,13 @@
             if($("#pic_up").val() != '') {
                 ajaxFileUpload();
             }
+        });
+
+        $(document).on("change","#qiniu-file",function(){
+            var obj = $("#qiniu-file");
+            var fileName = obj.val();            //上传的本地文件绝对路径
+            console.log(fileName);
+            $("#filename").val(fileName);
         });
 
         $(document).on("click",'.thumbnail',function(){
