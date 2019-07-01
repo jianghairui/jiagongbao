@@ -70,7 +70,7 @@ class Qiniu extends Common {
         $bucketManager = new BucketManager($auth);
 
 // 要列取文件的公共前缀
-        $prefix = 'tmp';
+        $prefix = 'upload';
 // 上次列举返回的位置标记，作为本次列举的起点信息。
         $marker = '';
 
@@ -82,12 +82,13 @@ class Qiniu extends Common {
         list($ret, $err) = $bucketManager->listFilesv2($this->bucket, $prefix, $marker, $limit, $delimiter, true);
 
         if ($err) {
-            return ajax($err,-111);
+            return ajax($err->message(),-111);
         } else {
             foreach ($ret as &$v) {
                 $v = json_decode($v,true);
 //                $v = json_decode($v,true)['item']['key'];
             }
+//            halt($ret);
             return ajax($ret);
         }
     }
@@ -123,29 +124,39 @@ class Qiniu extends Common {
         $bucketManager = new BucketManager($auth, $config);
         $err = $bucketManager->deleteAfterDays($this->bucket, $key, $days);
         if ($err) {
-            halt($err);
+            return ajax($err->message(),-1);
         }else {
-            echo 'SUCCESS';
+            return ajax();
         }
     }
 
+    public function deleteFile() {
+        $key = "upload/a.mp3";
+        $auth = new Auth($this->accessKey, $this->secretKey);
+        $config = new Config();
+        $bucketManager = new BucketManager($auth, $config);
+        $err = $bucketManager->delete($this->bucket, $key);
+        if ($err) {
+            return ajax($err->message(),-1);
+        }else {
+            return ajax();
+        }
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public function file_stat() {
+        $key = "upload/156198557182830600462.mp3";
+        $auth = new Auth($this->accessKey, $this->secretKey);
+        $config = new Config();
+        $bucketManager = new BucketManager($auth, $config);
+        list($fileInfo, $err) = $bucketManager->stat($this->bucket, $key);
+        if ($err) {
+//            halt($err);
+            return ajax($err->code(),-1);
+            return ajax($err->message(),-1);
+        } else {
+            halt($fileInfo);
+        }
+    }
 
 
     public function callBack() {

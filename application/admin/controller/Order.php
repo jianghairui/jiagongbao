@@ -254,7 +254,9 @@ class Order extends Base {
             foreach ($image_array as $v) {
                 @unlink($v);
             }
-            //todo 删除新附件
+            if($val['file_path']) {
+                $this->rs_delete($val['file_path']);
+            }
             return ajax($e->getMessage(),-1);
         }
         return ajax();
@@ -333,7 +335,7 @@ class Order extends Base {
                 }
             }
             if($val['file_path'] !== $order_exist['file_path']) {
-                //todo 删除新附件
+                $this->rs_delete($val['file_path']);
             }
             return ajax($e->getMessage(),-1);
         }
@@ -343,7 +345,7 @@ class Order extends Base {
             }
         }
         if($val['file_path'] !== $order_exist['file_path']) {
-            //todo 删除老附件
+            $this->rs_delete($order_exist['file_path']);
         }
         return ajax();
     }
@@ -520,9 +522,16 @@ class Order extends Base {
 
     //七牛云移动文件
     private function moveFile($file_path) {
+        $auth = new Auth($this->accessKey, $this->secretKey);
+        $config = new Config();
+        $bucketManager = new BucketManager($auth, $config);
 
         $key = str_replace('http://' . $this->domain . '/','',$file_path);
-        //todo 判断key是否存在
+//判断key是否存在
+        list($fileInfo, $err) = $bucketManager->stat($this->bucket, $key);
+        if ($err) {
+            throw new \Exception('七牛code:' . $err->code() .' , '. $err->message());
+        }
 
         $srcBucket = $this->bucket;
         $destBucket = $this->bucket;
@@ -532,15 +541,22 @@ class Order extends Base {
             return 'http://' . $this->domain . '/' . $destKey;
         }
 
-        $auth = new Auth($this->accessKey, $this->secretKey);
-        $config = new Config();
-        $bucketManager = new BucketManager($auth, $config);
         $err = $bucketManager->move($srcBucket, $srcKey, $destBucket, $destKey, true);
         if($err) {
             throw new \Exception($err->message());
         }else {
             return 'http://' . $this->domain . '/' . $destKey;
         }
+
+    }
+
+    //七牛云删除文件
+    private function rs_delete($file_path) {
+        $key = str_replace('http://' . $this->domain . '/','',$file_path);
+        $auth = new Auth($this->accessKey, $this->secretKey);
+        $config = new Config();
+        $bucketManager = new BucketManager($auth, $config);
+        $bucketManager->delete($this->bucket, $key);
     }
 
 
