@@ -210,42 +210,6 @@ class User extends Base {
 
     }
 
-    public function toExcel() {
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        $sheet->getColumnDimension('A')->setWidth(30);
-        $sheet->getColumnDimension('B')->setWidth(20);
-
-        $sheet->setTitle('SHIT-1');
-
-        $styleArray = [
-            'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-            ],
-        ];
-        $sheet->getStyle('A:Z')->applyFromArray($styleArray);
-//$sheet->getRowDimension('7')->setRowHeight(100);
-//$sheet->getStyle('A7:B7')->getFont()->setBold(true)->setName('Arial')->setSize(10);
-//$sheet->getStyle('A7')->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED);
-
-        $sheet->getStyle('A')->getNumberFormat()->setFormatCode( \PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER);
-
-        $sheet->setCellValue('A6', 120224199201080730);
-        $sheet->setCellValue('A7', '120224199201080730');
-        $sheet->setCellValue('B7', '13102163019');
-
-
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
-//header(‘Content-Type:application/vnd.ms-excel‘);//告诉浏览器将要输出Excel03版本文件
-        header('Content-Disposition: attachment;filename="01simple.xlsx"');//告诉浏览器输出浏览器名称
-        header('Cache-Control: max-age=0');//禁止缓存
-
-        $writer = new Xlsx($spreadsheet);
-        $writer->save('php://output');
-    }
-
 
     public function rechargeList() {
         $param['status'] = input('param.status','');
@@ -286,7 +250,7 @@ class User extends Base {
             $page['curr'] = $curr_page;
             $page['totalPage'] = ceil($count/$perpage);
             $list = Db::table('mp_vip_order')->alias('o')
-                ->join('mp_userinfo i','o.uid=i.uid')
+                ->join('mp_userinfo i','o.uid=i.uid','left')
                 ->field('o.*,i.linktel,i.name')
                 ->where($where)->limit(($curr_page - 1)*$perpage,$perpage)->select();
         } catch(\Exception $e) {
