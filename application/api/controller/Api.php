@@ -200,18 +200,21 @@ class Api extends Common {
             ];
             $collect = Db::table('mp_collect')->where($where)->find();
             if($collect) {
-                return ajax('已收藏',55);
+                Db::table('mp_collect')->where($where)->delete();
+                return ajax('已取消');
+            }else {
+                $insert_data = [
+                    'uid' => $this->myinfo['id'],
+                    'order_id' => $val['order_id'],
+                    'create_time' => time()
+                ];
+                Db::table('mp_collect')->insert($insert_data);
+                return ajax('已收藏');
             }
-            $insert_data = [
-                'uid' => $this->myinfo['id'],
-                'order_id' => $val['order_id'],
-                'create_time' => time()
-            ];
-            Db::table('mp_collect')->insert($insert_data);
+
         } catch(\Exception $e) {
             return ajax($e->getMessage(),-1);
         }
-        return ajax();
     }
 
     //立即报价
