@@ -128,6 +128,12 @@
             </div>
         </div>
         <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"></label>
+            <div class="formControls col-xs-6 col-sm-6">
+                <span class="btn btn-link" onclick="new_page('报价详情','{:url("Order/offerList",array("id"=>$info["id"]))}',800,400)">查看报价详情</span>
+            </div>
+        </div>
+        <div class="row cl">
             <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
                 <button class="btn btn-primary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
                 <button onClick="layer_close();" class="btn btn-default radius" type="button">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
@@ -425,4 +431,9 @@
 
 
     });
+
+    /*打开新页面*/
+    function new_page(title,url,w,h){
+        layer_show(title,url,w,h);
+    }
 </script>
