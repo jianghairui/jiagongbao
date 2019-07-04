@@ -1,0 +1,54 @@
+<div class="page-container">
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l"></span>
+        <span class="r">共有数据：<strong>{$page.count}</strong> 条</span> </div>
+    <table class="table table-border table-bordered table-bg">
+        <thead>
+        <tr class="text-c">
+            <th width="80">报价</th>
+            <th>企业名称</th>
+            <th width="120">负责人姓名</th>
+            <th width="100">联系电话</th>
+            <th width="120">报价时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        <form id="multi-check">
+            {foreach $list as $li}
+            <tr class="text-c userinfo">
+                <td>￥：{$li.price}</td>
+                <td>{$li.name}</td>
+                <td>{$li.linkman}</td>
+                <td>{$li.linktel}</td>
+                <td>{$li.create_time|date="Y-m-d h:i"}</td>
+            </tr>
+            {/foreach}
+        </form>
+
+        <tr>
+            <td colspan="5" id="page" class="text-r"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script>
+<script type="text/javascript">
+    var url = '{:url("Order/offerList")}' + '?<?php echo $page["query"];?>';
+    var curr = '{$page.curr}',totalPage='{$page.totalPage}';
+    if(totalPage > 1) {
+        laypage({
+            cont: 'page', //容器。值支持id名、原生dom对象，jquery对象。
+            pages: '{$page.totalPage}', //通过后台拿到的总页数
+            skip: false, //是否开启跳页
+            skin: '#5a98de',
+            curr: curr || 1, //当前页
+            jump: function(obj, first){ //触发分页后的回调
+                // console.log(obj)
+                if(!first) {
+                    window.location.href = url+'&page=' + obj.curr;
+                }
+            }
+        });
+    }
+</script>

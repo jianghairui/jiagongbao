@@ -47,14 +47,18 @@
 <script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script>
 <script type="text/javascript">
     (function(){
-        var wait = document.getElementById('wait')
+        var wait = document.getElementById('wait');
         var interval = setInterval(function(){
             var time = --wait.innerHTML;
             if(time <= 0) {
-                layer_close()
-                removeIframe()
-                clearInterval(interval);
-            };
+                if (window != top) {
+                    layer_close();
+                    removeIframe();
+                    clearInterval(interval);
+                }else {
+                    window.history.back();
+                }
+            }
         }, 1000);
     })();
 </script>

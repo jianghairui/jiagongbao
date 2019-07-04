@@ -133,6 +133,35 @@ class Order extends Base {
         return $this->fetch();
     }
 
+    //报价详情
+    public function offerList() {
+        $order = ['p.id'=>'DESC'];
+        $val['order_id'] = input('param.id');
+        $curr_page = input('param.page',1);
+        $perpage = input('param.perpage',10);
+        $page['query'] = http_build_query(input('param.'));
+        try {
+            $where = [
+                ['p.order_id','=',$val['order_id']]
+            ];
+            $count = Db::table('mp_offer_price')->alias('p')->where($where)->count();
+            $list = Db::table('mp_offer_price')->alias('p')
+                ->join('mp_userinfo u','p.uid=u.uid','left')
+                ->where($where)
+                ->field('p.price,p.id,u.*')
+                ->limit(($curr_page - 1)*$perpage,$perpage)
+                ->order($order)
+                ->select();
+        } catch(\Exception $e) {
+            die($e->getMessage());
+        }
+        $page['count'] = $count;
+        $page['curr'] = $curr_page;
+        $page['totalPage'] = ceil($count/$perpage);
+        $this->assign('page',$page);
+        $this->assign('list',$list);
+        return $this->fetch();
+    }
     //获取城市列表
     public function getCityList() {
         $val['provinceCode'] = input('post.provinceCode');
@@ -505,7 +534,6 @@ class Order extends Base {
         }
         return ajax();
     }
-
     //轮播图排序
     public function orderCateSort() {
         $val['id'] = input('post.id');
