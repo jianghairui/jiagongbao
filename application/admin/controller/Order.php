@@ -229,9 +229,9 @@ class Order extends Base {
 
             $val['cate_ids'] = implode(',',array_unique($val['cate_ids']));
 
-            if(empty($images)) {
-                return ajax('至少上传一张图片',-1);
-            }
+//            if(empty($images)) {
+//                return ajax('至少上传一张图片',-1);
+//            }
             if(count($images) > 9) {
                 return ajax('最多上传9张图片',-1);
             }
@@ -307,9 +307,9 @@ class Order extends Base {
 
             $val['cate_ids'] = implode(',',array_unique($val['cate_ids']));
 
-            if(empty($images)) {
-                return ajax('至少上传一张图片',-1);
-            }
+//            if(empty($images)) {
+//                return ajax('至少上传一张图片',-1);
+//            }
             if(count($images) > 9) {
                 return ajax('最多上传9张图片',-1);
             }

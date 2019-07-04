@@ -69,7 +69,7 @@
             <th width="25">#</th>
             <th width="80">图片</th>
             <th>订单标题</th>
-            <th width="120">地区</th>
+            <th width="150">地区</th>
             <th width="80">数量</th>
             <th width="100">材质</th>
             <th width="120">审核状态</th>
@@ -83,8 +83,15 @@
             <tr class="text-c userinfo">
                 <td rowspan="3">{$li.id}</td>
                 <td>
-                    <?php $pics = unserialize($li['pics']);?>
-                    <div style="width: 80px;height: 80px;background-image: url('/{$pics[0]}');background-position: center;background-repeat: no-repeat;background-size: cover"></div>
+                    <?php
+                    $pics = unserialize($li['pics']);
+                    if(empty($pics)) {
+                        $pic = 'static/none.jpg';
+                    }else {
+                        $pic = $pics[0];
+                    }
+                    ?>
+                    <div style="width: 80px;height: 80px;background-image: url('/{$pic}');background-position: center;background-repeat: no-repeat;background-size: cover"></div>
                 </td>
                 <td>{$li.title}</td>
                 <td>{$li.address}</td>

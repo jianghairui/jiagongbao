@@ -71,8 +71,7 @@
                 <div class="row cl">
                     <label class="form-label col-xs-4 col-sm-2">会员特权说明：</label>
                     <div class="formControls col-xs-8 col-sm-9">
-                        <textarea name="vip_desc" cols="" rows="" class="textarea" maxlength="1000" placeholder="会员特权说明" oninput="this.value.length<=1000?$('#textlen').text(this.value.length):$('#textlen').text(1000)" >{$info.vip_desc}</textarea>
-                        <p class="textarea-numberbar"><em class="textarea-length" id="textlen">0</em>/1000</p>
+                        <textarea id="editor" type="text/plain" name="vip_desc" style="width:100%;height:400px;">{$info.vip_desc|htmlspecialchars_decode}</textarea>
                     </div>
                 </div>
                 <div class="row cl">
@@ -106,9 +105,17 @@
 <script type="text/javascript" src="/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
 <script type="text/javascript" src="/lib/jquery.validation/1.14.0/validate-methods.js"></script>
 <script type="text/javascript" src="/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+
+<script type="text/javascript" src="/lib/ueditor/1.4.3/ueditor.config.js"></script>
+<script type="text/javascript" src="/lib/ueditor/1.4.3/ueditor.all.min.js"> </script>
+<script type="text/javascript" src="/lib/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script>
+
 <script type="text/javascript" src="/lib/checkfile.js"></script>
 <script type="text/javascript">
     $(function(){
+
+        var ue = UE.getEditor('editor');
+
         $("#tab-system").Huitab({
             index:0
         });
@@ -131,9 +138,6 @@
                     required: true
                 },
                 bank_account: {
-                    required: true
-                },
-                vip_desc: {
                     required: true
                 },
                 pay_desc: {
@@ -171,8 +175,6 @@
             }
         });
 
-        var textlen = $("textarea[name='vip_desc']").val().length;
-        $("#textlen").text(textlen);
         var textlen1 = $("textarea[name='pay_desc']").val().length;
         $("#textlen1").text(textlen1);
 

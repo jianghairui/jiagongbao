@@ -47,8 +47,8 @@ class Order extends Common {
 
             $val['cate_ids'] = implode(',',array_unique($val['cate_ids']));
 
-            if(!is_array($images) || empty($images)) {
-                return ajax('至少上传一张图片',3);
+            if(!is_array($images)) {
+                return ajax('pic_url字段必须为数组',-1);
             }
             if(count($images) > 9) {
                 return ajax('最多上传9张图片',8);
