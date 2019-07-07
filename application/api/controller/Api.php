@@ -111,14 +111,19 @@ class Api extends Common {
             $list = Db::table('mp_order')
                 ->where($where)
                 ->where($find_in_set)
-                ->limit(($curr_page-1)*$perpage,$perpage)
                 ->order($order)
+                ->limit(($curr_page-1)*$perpage,$perpage)
                 ->field('id,pics,title,address,num,create_time')->select();
         } catch(\Exception $e) {
             return ajax($e->getMessage(),-1);
         }
         foreach ($list as &$v) {
-            $v['pics'] = unserialize($v['pics'])[0];
+            $pics = unserialize($v['pics']);
+            if(empty($pics)) {
+                $v['pics'] = '';
+            }else {
+                $v['pics'] = $pics[0];
+            }
             $v['create_time'] = date('Y-m-d',$v['create_time']);
         }
         return ajax($list);

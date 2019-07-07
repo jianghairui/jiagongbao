@@ -155,7 +155,12 @@ class My extends Common {
             return ajax($e->getMessage(),-1);
         }
         foreach ($list as &$v) {
-            $v['pics'] = unserialize($v['pics'])[0];
+            $pics = unserialize($v['pics']);
+            if(empty($pics)) {
+                $v['pics'] = '';
+            }else {
+                $v['pics'] = $pics[0];
+            }
             $v['create_time'] = date('Y-m-d',$v['create_time']);
         }
         return ajax($list);
