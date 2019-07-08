@@ -47,7 +47,7 @@ class Pay extends Common {
             'out_trade_no' => $exist['pay_order_sn'],
             'total_fee' => floatval($total_price)*100,
             'spbill_create_ip' => $_SERVER['REMOTE_ADDR'],
-            'notify_url' => $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . "/api/pay/wxNotify",
+            'notify_url' => $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . "/api/pay/wxPayNotify",
             'trade_type' => 'APP'
         ];
 
