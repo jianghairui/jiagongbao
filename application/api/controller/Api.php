@@ -227,7 +227,7 @@ class Api extends Common {
         }
     }
 
-    //立即报价
+    //立即/修改报价
     public function offerPrice() {
         $val['order_id'] = input('post.order_id');
         $val['price'] = input('post.price');
