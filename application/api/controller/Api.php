@@ -143,7 +143,7 @@ class Api extends Common {
                 ->where($whereOrder)
                 ->field("id,title,address,cate_ids,material,num,end_time,desc,pics,file_path,compname,linkman,linktel,create_time,status")->find();
             if(!$order_exist) {
-                return ajax('非法参数',-4);
+                return ajax('非法参数',4);
             }
 
             $whereCollect = [
@@ -169,6 +169,11 @@ class Api extends Common {
                     $cate_names[] = $cate_arr[$v];
                 }
             }
+            $whereOffer = [
+                ['uid','=',$this->myinfo['id']],
+                ['order_id','=',$val['order_id']]
+            ];
+            $order_exist['price'] = Db::table('mp_offer_price')->where($whereOffer)->value('price');
             $order_exist['cate_names'] = $cate_names;
             $order_exist['free_times'] = $this->myinfo['free_times'];
             $order_exist['pics'] = unserialize($order_exist['pics']);

@@ -10,7 +10,6 @@ use think\Db;
 use my\Sendsms;
 class My extends Common {
 
-
     //获取个人信息
     public function getMyinfo() {
         $id = $this->myinfo['id'];
@@ -133,7 +132,7 @@ class My extends Common {
         return ajax();
     }
 
-    //外发订单
+    //外发订单列表
     public function myOrderList() {
         $curr_page = input('post.page',1);
         $perpage = input('post.perpage',15);
@@ -220,6 +219,27 @@ class My extends Common {
         return ajax($order_exist);
     }
 
+    //查看订单报价详情
+    public function offerList() {
+        $order = ['p.id'=>'DESC'];
+        $val['order_id'] = input('post.order_id');
+        checkPost($val);
+        try {
+            $where = [
+                ['p.order_id','=',$val['order_id']]
+            ];
+            $list = Db::table('mp_offer_price')->alias('p')
+                ->join('mp_userinfo u','p.uid=u.uid','left')
+                ->where($where)
+                ->field('p.price,u.*')
+                ->order($order)
+                ->select();
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax($list);
+    }
+
     //修改订单
     public function orderMod() {
         $val['title'] = input('post.title');
@@ -299,28 +319,7 @@ class My extends Common {
     }
 
 
-    //查看报价
-    public function offerList() {
-        $order = ['p.id'=>'DESC'];
-        $val['order_id'] = input('post.order_id');
-        checkPost($val);
-        try {
-            $where = [
-                ['p.order_id','=',$val['order_id']]
-            ];
-            $list = Db::table('mp_offer_price')->alias('p')
-                ->join('mp_userinfo u','p.uid=u.uid','left')
-                ->where($where)
-                ->field('p.price,u.*')
-                ->order($order)
-                ->select();
-        } catch(\Exception $e) {
-            return ajax($e->getMessage(),-1);
-        }
-        return ajax($list);
-    }
-
-    //我的报价
+    //我的报价订单列表
     public function myOfferList() {
         $curr_page = input('post.page',1);
         $perpage = input('post.perpage',15);
@@ -342,7 +341,12 @@ class My extends Common {
             return ajax($e->getMessage(),-1);
         }
         foreach ($list as &$v) {
-            $v['pics'] = unserialize($v['pics'])[0];
+            $pics = unserialize($v['pics']);
+            if(empty($pics)) {
+                $v['pics'] = '';
+            }else {
+                $v['pics'] = $pics[0];
+            }
             $v['create_time'] = date('Y-m-d',$v['create_time']);
         }
         return ajax($list);
@@ -430,7 +434,12 @@ class My extends Common {
             return ajax($e->getMessage(),-1);
         }
         foreach ($list as &$v) {
-            $v['pics'] = unserialize($v['pics'])[0];
+            $pics = unserialize($v['pics']);
+            if(empty($pics)) {
+                $v['pics'] = '';
+            }else {
+                $v['pics'] = $pics[0];
+            }
             $v['create_time'] = date('Y-m-d',$v['create_time']);
         }
         return ajax($list);
