@@ -20,7 +20,14 @@ class Plan extends Controller {
     }
 
     public function test() {
-        $this->planlog($this->cmd,var_export($_SERVER['REMOTE_ADDR'],true));
+        $arr = [];
+        try {
+            echo $arr['name'];
+        } catch (\Exception $e) {
+            echo 'catch result: ';
+            die($e->getMessage());
+        }
+//        $this->planlog($this->cmd,var_export($_SERVER['REMOTE_ADDR'],true));
 //        halt($_SERVER);
     }
 
