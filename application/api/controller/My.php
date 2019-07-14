@@ -44,12 +44,13 @@ class My extends Common {
                 'code' => mt_rand(100000,999999),
                 'create_time' => time()
             ];
+            $tpl_code = 'SMS_168555512';
             $exist = Db::table('mp_verify')->where('tel',$tel)->find();
             if($exist) {
                 if((time() - $exist['create_time']) < 60) {
                     return ajax('1分钟内不可重复发送',11);
                 }
-                $res = $sms->send($param);
+                $res = $sms->send($param,$tpl_code);
                 if($res->Code === 'OK') {
                     Db::table('mp_verify')->where('tel',$tel)->update($param);
                     return ajax();
@@ -57,7 +58,7 @@ class My extends Common {
                     return ajax($res->Message,12);
                 }
             }else {
-                $res = $sms->send($param);
+                $res = $sms->send($param,$tpl_code);
                 if($res->Code === 'OK') {
                     Db::table('mp_verify')->insert($param);
                     return ajax();
