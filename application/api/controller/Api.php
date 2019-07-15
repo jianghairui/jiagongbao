@@ -175,6 +175,19 @@ class Api extends Common {
         return ajax($list);
     }
 
+    public function clearSearchLog() {
+        $uid = $this->myinfo['id'];
+        $where = [
+            ['uid','=',$uid],
+        ];
+        try {
+            Db::table('mp_search_log')->where($where)->delete();
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax();
+    }
+
     //获取订单详情
     public function getOrderDetail() {
         $val['order_id'] = input('post.order_id');
