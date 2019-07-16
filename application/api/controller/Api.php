@@ -31,11 +31,13 @@ class Api extends Common {
     public function completeInfo() {
 
         $val['name'] = input('post.name');
+
+        $val['linktel'] = input('post.linktel');
+        checkPost($val);
         $val['address'] = input('post.address');
         $val['linkman'] = input('post.linkman');
-        $val['linktel'] = input('post.linktel');
         $val['busine'] = input('post.busine');
-        checkPost($val);
+
         $val['create_time'] = time();
         if(!is_tel($val['linktel'])) {
             return ajax('invalid tel',6);
@@ -129,6 +131,63 @@ class Api extends Common {
         return ajax($list);
     }
 
+    public function searchLog() {
+        $val['search'] = input('post.search');
+        checkPost($val);
+        try {
+            $val['uid'] = $this->myinfo['id'];
+            $val['create_time'] = time();
+            $where = [
+                ['uid','=',$val['uid']],
+                ['search','=',$val['search']]
+            ];
+            $exist = Db::table('mp_search_log')->where($where)->find();
+
+            //$count = Db::table('mp_search_log')->where('uid','=',$val['uid'])->count();
+            if($exist) {
+                Db::table('mp_search_log')->where($where)->update($val);
+            }else {
+//                if($count >= 10) {
+//
+//                }
+                Db::table('mp_search_log')->insert($val);
+            }
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax();
+    }
+
+    public function searchLogList() {
+        $uid = $this->myinfo['id'];
+        $where = [
+            ['uid','=',$uid],
+        ];
+        try {
+            $list = Db::table('mp_search_log')->where($where)
+                ->order(['create_time'=>'DESC'])
+                ->limit(0,10)
+                ->field('search,create_time')
+                ->select();
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax($list);
+    }
+
+    public function clearSearchLog() {
+        $uid = $this->myinfo['id'];
+        $where = [
+            ['uid','=',$uid],
+        ];
+        try {
+            Db::table('mp_search_log')->where($where)->delete();
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax();
+    }
+
     //获取订单详情
     public function getOrderDetail() {
         $val['order_id'] = input('post.order_id');
@@ -199,11 +258,22 @@ class Api extends Common {
     }
 
 
-    //收藏订单
+    //收藏|取消订单
     public function orderCollect() {
         $val['order_id'] = input('post.order_id');
         checkPost($val);
         try {
+            $whereOrder = [
+                ['id','=',$val['order_id']]
+            ];
+            $exist = Db::table('mp_order')->where($whereOrder)->find();
+            if($exist) {
+                return ajax('非法参数',-4);
+            }
+
+            if($exist['status'] != 1) {
+                return ajax('当前状态不可收藏',58);
+            }
             $where = [
                 ['order_id','=',$val['order_id']],
                 ['uid','=',$this->myinfo['id']]
