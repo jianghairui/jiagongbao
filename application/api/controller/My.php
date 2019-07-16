@@ -141,7 +141,8 @@ class My extends Common {
         $status = input('post.status');
         try {
             $where = [
-                ['uid','=',$this->myinfo['id']]
+                ['uid','=',$this->myinfo['id']],
+                ['del','=',0]
             ];
             if(!is_null($status) && $status !== '') {
                 $where[] = ['status','=',$status];
@@ -150,7 +151,7 @@ class My extends Common {
                 ->where($where)
                 ->limit(($curr_page-1)*$perpage,$perpage)
                 ->order($order)
-                ->field('id,pics,title,address,num,create_time,status')->select();
+                ->field('id,pics,title,address,num,create_time,end_time,offer_num,status')->select();
         } catch(\Exception $e) {
             return ajax($e->getMessage(),-1);
         }
@@ -179,7 +180,7 @@ class My extends Common {
             ];
             $order_exist = Db::table('mp_order')
                 ->where($whereOrder)
-                ->field("id,title,address,cate_ids,material,num,end_time,desc,pics,file_path,compname,linkman,linktel,status")->find();
+                ->field("id,title,address,cate_ids,material,num,end_time,offer_num,desc,pics,file_path,compname,linkman,linktel,status")->find();
             if(!$order_exist) {
                 return ajax('订单不存在或状态已改变',4);
             }
@@ -334,7 +335,7 @@ class My extends Common {
             $list = Db::table('mp_offer_price')->alias('p')
                 ->join('mp_order o','p.order_id=o.id','left')
                 ->where($whereOffer)
-                ->field('p.price,p.order_id,o.pics,o.title,o.address,o.num,o.create_time,o.status')
+                ->field('p.price,p.order_id,o.pics,o.title,o.address,o.num,o.create_time,o.end_time,o.status')
                 ->limit(($curr_page-1)*$perpage,$perpage)
                 ->order($order)
                 ->select();
@@ -415,7 +416,8 @@ class My extends Common {
         $order = ['id'=>'DESC'];
         try {
             $whereCollect = [
-                ['uid','=',$this->myinfo['id']]
+                ['uid','=',$this->myinfo['id']],
+                ['del','=',0]
             ];
             $collect_orderids = Db::table('mp_collect')->where($whereCollect)->column('order_id');
             if(empty($collect_orderids)) {
@@ -430,7 +432,7 @@ class My extends Common {
                 ->where($where)
                 ->limit(($curr_page-1)*$perpage,$perpage)
                 ->order($order)
-                ->field('id,pics,title,address,num,create_time')->select();
+                ->field('id,pics,title,address,num,create_time,end_time')->select();
         } catch(\Exception $e) {
             return ajax($e->getMessage(),-1);
         }

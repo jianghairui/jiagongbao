@@ -76,8 +76,24 @@ class Api extends Common {
         return ajax($list);
     }
 
-    //获取分类列表
+    //获取首页分类列表
     public function getCateList() {
+        $where = [
+            ['del','=',0],
+            ['recommend','=',1]
+        ];
+        $order = ['sort'=>'ASC'];
+        try {
+            $data['count'] = Db::table('mp_order_cate')->where($where)->count();
+            $data['list'] = Db::table('mp_order_cate')->where($where)->field('id,cate_name,pic')->order($order)->select();
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax($data);
+    }
+
+    //获取分类列表
+    public function getAllCateList() {
         $where = [
             ['del','=',0]
         ];
@@ -115,7 +131,7 @@ class Api extends Common {
                 ->where($find_in_set)
                 ->order($order)
                 ->limit(($curr_page-1)*$perpage,$perpage)
-                ->field('id,pics,title,address,num,create_time')->select();
+                ->field('id,pics,title,address,num,create_time,end_time')->select();
         } catch(\Exception $e) {
             return ajax($e->getMessage(),-1);
         }
@@ -336,6 +352,7 @@ class Api extends Common {
                 Db::table('mp_offer_price')->where($whereOffer)->update($update_data);
             }else {
                 Db::table('mp_offer_price')->insert($val);
+                Db::table('mp_order')->where($where)->setInc('offer_num',1);
             }
             if(!$this->myinfo['vip']) {
                 Db::table('mp_user')->where('id','=',$this->myinfo['id'])->setDec('free_times',1);

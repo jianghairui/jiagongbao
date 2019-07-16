@@ -28,6 +28,7 @@ class System extends Base {
         $val['corporation'] = input('post.corporation');
         $val['bank_type'] = input('post.bank_type');
         $val['bank_account'] = input('post.bank_account');
+        $val['treaty'] = input('post.treaty');
         checkInput($val);
         $val['allow_ip'] = input('post.allow_ip');
 
