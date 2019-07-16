@@ -545,6 +545,14 @@ class Order extends Base {
         }
         return ajax();
     }
+
+    public function cateSet() {
+
+    }
+
+    public function cateUnset() {
+
+    }
     //轮播图排序
     public function orderCateSort() {
         $val['id'] = input('post.id');
