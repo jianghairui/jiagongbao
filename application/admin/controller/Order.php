@@ -47,12 +47,12 @@ class Order extends Base {
             $where[] = ['status','=',$param['status']];
         }
 
-        if($param['regionCode']) {
-            $where[] = ['region_code','=',$param['regionCode']];
+        if ($param['provinceCode']) {
+            $where[] = ['province_code','=',$param['provinceCode']];
         }elseif ($param['cityCode']) {
             $where[] = ['city_code','=',$param['cityCode']];
-        }elseif ($param['provinceCode']) {
-            $where[] = ['province_code','=',$param['provinceCode']];
+        }elseif ($param['regionCode']) {
+            $where[] = ['region_code','=',$param['regionCode']];
         }
 
         try {
@@ -76,8 +76,19 @@ class Order extends Base {
                 ['level','=',1]
             ];
             $province_list = Db::table('mp_city')->where($whereCity)->select();
-            $city_list = Db::table('mp_city')->where('pcode','=',$province_list[0]['code'])->select();
-            $region_list = Db::table('mp_city')->where('pcode','=',$city_list[0]['code'])->select();
+
+            if ($param['provinceCode']) {
+                $city_list = Db::table('mp_city')->where('pcode','=',$param['provinceCode'])->select();
+            }else {
+                $city_list = Db::table('mp_city')->where('pcode','=',$province_list[0]['code'])->select();
+            }
+
+            if ($param['cityCode']) {
+                $region_list = Db::table('mp_city')->where('pcode','=',$param['cityCode'])->select();
+            }else{
+                $region_list = Db::table('mp_city')->where('pcode','=',$city_list[0]['code'])->select();
+            }
+
         }catch (\Exception $e) {
             die('SQL错误: ' . $e->getMessage());
         }
