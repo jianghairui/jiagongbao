@@ -16,30 +16,28 @@ class Test extends Controller {
         $app_key = '8e123d2b7b9f85f29457b1fb';
         $master_secret = '84469df28646b679085ca3ca';
         $client = new JPush($app_key, $master_secret);
-        halt($client);
-
 
         $pusher = $client->push();
-        $pusher->setPlatform('all');
+        $platform_all = 'all';
+        $platform = ['ios', 'android'];
+        $pusher->setPlatform($platform);
         $pusher->addAllAudience();
-        $pusher->setNotificationAlert('Hello, JPush');
+        $pusher->setNotificationAlert('欢迎使用加工宝APP');
         try {
             $result = $pusher->send();
         } catch (\JPush\Exceptions\JPushException $e) {
             // try something else here
-            print $e;
+            die($e->getMessage());
         }
         halt($result);
     }
 
     public function index() {
-        try {
-            $arr = [];
-            $a = $arr['name'];
-        } catch(\Exception $e) {
-            echo 'LALLALA<br>';
-        }
-        echo 'I AM OK';
+        $app_key = getenv('app_key');
+        $master_secret = getenv('master_secret');
+        $registration_id = getenv('registration_id');
+
+        $client = new JPush($app_key, $master_secret);
     }
 
 
