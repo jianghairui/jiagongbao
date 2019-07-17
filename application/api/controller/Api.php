@@ -267,7 +267,7 @@ class Api extends Common {
                 ['id','=',$val['order_id']]
             ];
             $exist = Db::table('mp_order')->where($whereOrder)->find();
-            if($exist) {
+            if(!$exist) {
                 return ajax('非法参数',-4);
             }
 
