@@ -73,6 +73,7 @@
             <th width="80">数量</th>
             <th width="100">材质</th>
             <th width="120">审核状态</th>
+            <th width="100">报价数量</th>
             <th width="120">发布时间</th>
             <th width="100">操作</th>
         </tr>
@@ -111,6 +112,7 @@
                     {default /}{$li['status']}
                     {/switch}
                 </td>
+                <td>{$li.offer_num}</td>
                 <td>{$li.create_time|date="Y-m-d H:i:s"}</td>
                 <td class="td-manage" rowspan="3">
                     <a style="text-decoration:none" onclick="add_info('订单信息','{:url("Order/orderDetail",array("id"=>$li["id"]))}')" class="ml-5" href="javascript:;" title="查看订单">
@@ -127,7 +129,7 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="7">
+                <td colspan="8">
                     <?php $cate_arr=explode(',',$li['cate_ids']);?>
                     <p style="margin-left: 15px;">分类:
                         {foreach $cate_arr as $fo}
@@ -140,7 +142,7 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="7">
+                <td colspan="8">
                     <span style="margin-left: 15px;">公司名称: <b>{$li.compname}</b></span> &nbsp;&nbsp;&nbsp;&nbsp;(负责人: <b>{$li.linkman}</b> | 手机号: <b>{$li.linktel}</b>)
                 </td>
             </tr>

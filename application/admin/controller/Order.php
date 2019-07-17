@@ -61,7 +61,7 @@ class Order extends Base {
                 $find_in_set = "FIND_IN_SET('".$param['cate_id']."',cate_ids)";
             }
 
-            $count = Db::table('mp_order')->where($where)->count();
+            $count = Db::table('mp_order')->where($find_in_set)->where($where)->count();
             $list = Db::table('mp_order')
                 ->order($order)
                 ->where($find_in_set)
@@ -535,19 +535,34 @@ class Order extends Base {
     public function cateDel() {
         $id = input('post.id');
         try {
-            $exist = Db::table('mp_order_cate')->where('id',$id)->find();
+            $exist = Db::table('mp_order_cate')->where('id','=',$id)->find();
             if(!$exist) {
                 return ajax('非法参数',-1);
             }
-            Db::table('mp_order_cate')->where('id',$id)->update(['del'=>1]);
+            Db::table('mp_order_cate')->where('id','=',$id)->update(['del'=>1]);
         }catch (\Exception $e) {
             return ajax($e->getMessage(),-1);
         }
         return ajax();
     }
 
-    public function cateSet() {
-
+    public function cateRecommend() {
+        $id = input('post.id');
+        try {
+            $exist = Db::table('mp_order_cate')->where('id','=',$id)->find();
+            if(!$exist) {
+                return ajax('非法参数',-1);
+            }
+            if($exist['recommend'] == 0) {
+                Db::table('mp_order_cate')->where('id','=',$id)->update(['recommend'=>1]);
+                return ajax(1);
+            }else {
+                Db::table('mp_order_cate')->where('id','=',$id)->update(['recommend'=>0]);
+                return ajax(0);
+            }
+        }catch (\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
     }
 
     public function cateUnset() {

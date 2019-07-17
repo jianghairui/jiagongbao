@@ -27,6 +27,15 @@
                 </td>
                 <td>{$li.cate_name}</td>
                 <td class="td-manage">
+                    {if $li['recommend']}
+                        <a style="text-decoration:none" onclick="cate_recommend(this,{$li.id})"  class="ml-5" href="javascript:;" title="取消推荐">
+                            <i class="Hui-iconfont" style="color: black;">&#xe630;</i>
+                        </a>
+                        {else /}
+                        <a style="text-decoration:none" onclick="cate_recommend(this,{$li.id})"  class="ml-5" href="javascript:;" title="推荐首页">
+                            <i class="Hui-iconfont" style="color: lightgrey;">&#xe630;</i>
+                        </a>
+                    {/if}
                     <a style="text-decoration:none" onclick="add_info('修改分类','{:url("Order/cateDetail",array("id"=>$li["id"]))}')"  class="ml-5" href="javascript:;" title="修改分类">
                     <i class="Hui-iconfont">&#xe6df;</i>
                     </a>
@@ -45,6 +54,8 @@
 <script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script>
 <script type="text/javascript">
+
+    var isclick = true;
 
     /*添加分类*/
     function add_info(title,url){
@@ -78,6 +89,37 @@
                 },
             });
         });
+    }
+
+
+    function cate_recommend(obj,id) {
+        if(isclick) {
+            isclick = false;
+            $.ajax({
+                url: "{:url('Order/cateRecommend')}",
+                type: 'POST',
+                dataType: 'json',
+                data:{id:id},
+                success: function(data){
+                    if(data.code == 1) {
+                        if(data.data == 1) {
+                            $(obj).attr('title','取消推荐');
+                            $(obj).html('<i class="Hui-iconfont" style="color: black;">&#xe630;</i>');
+                        }else {
+                            $(obj).attr('title','推荐首页');
+                            $(obj).html('<i class="Hui-iconfont" style="color: lightgrey;">&#xe630;</i>');
+                        }
+                    }else {
+                        layer.msg(data.data,{icon:2,time:1000});
+                    }
+                    isclick = true;
+                },
+                error:function(data) {
+                    layer.msg('接口请求失败!',{icon:6,time:1000});
+                    isclick = true;
+                }
+            });
+        }
     }
 
 

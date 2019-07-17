@@ -75,6 +75,12 @@
                     </div>
                 </div>
                 <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">APP用户协议：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <textarea id="editor2" type="text/plain" name="treaty" style="width:100%;height:400px;">{$info.treaty|htmlspecialchars_decode}</textarea>
+                    </div>
+                </div>
+                <div class="row cl">
                     <label class="form-label col-xs-4 col-sm-2">支付说明：</label>
                     <div class="formControls col-xs-8 col-sm-9">
                         <textarea name="pay_desc" cols="" rows="" class="textarea" maxlength="255" placeholder="支付说明" oninput="this.value.length<=255?$('#textlen1').text(this.value.length):$('#textlen1').text(255)" >{$info.pay_desc}</textarea>
@@ -115,6 +121,7 @@
     $(function(){
 
         var ue = UE.getEditor('editor');
+        var ue2 = UE.getEditor('editor2');
 
         $("#tab-system").Huitab({
             index:0
@@ -124,7 +131,6 @@
         //表单验证
         $("#formAjax").validate({
             rules:{
-
                 vip_price: {
                     required: true
                 },

@@ -35,6 +35,7 @@ class Common extends Controller {
             'Login/resetpasswd',
             'Api/getslidelist',
             'Api/getcatelist',
+            'Api/getallcatelist',
             'Api/getorderlist',
             'Api/getprovincelist',
             'Api/getcitylist',

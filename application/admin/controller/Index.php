@@ -8,7 +8,31 @@ class Index extends Base
     public function index() {
         $auth = new Auth();
         $authlist = $auth->getAuthList(session('admin_id'));
+
+        try {
+            $whereOrder = [
+                ['del','=',0]
+            ];
+            $count['order_count'] = Db::table('mp_order')->where($whereOrder)->count();
+            $whereUser = [
+                ['del','=',0]
+            ];
+            $count['user_count'] = Db::table('mp_user')->where($whereUser)->count();
+            $whereVip = [
+                ['vip','=',1],
+                ['del','=',0]
+            ];
+            $count['vip_count'] = Db::table('mp_user')->where($whereVip)->count();
+            $whereMoney = [
+                ['status','=',1]
+            ];
+            $count['money_count'] = Db::table('mp_vip_order')->where($whereMoney)->sum('pay_price');
+            $count['vip_pv'] = Db::table('mp_user')->sum('vip_pv');
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
         $this->assign('authlist',$authlist);
+        $this->assign('count',$count);
         return $this->fetch();
     }
 

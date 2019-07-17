@@ -18,7 +18,8 @@ class Login extends Common {
         try {
             $whereUser = [
                 ['tel','=',$val['tel']],
-                ['password','=',md5($val['password'] . config('login_key'))]
+                ['password','=',md5($val['password'] . config('login_key'))],
+                ['del','=',0]
             ];
             $user_exist = Db::table('mp_user')->where($whereUser)->find();
             if($user_exist) {
@@ -102,7 +103,8 @@ class Login extends Common {
                 return ajax('验证码无效',16);
             }
             $whereUser = [
-                ['tel','=',$val['tel']]
+                ['tel','=',$val['tel']],
+                ['del','=',0]
             ];
             $user_exist = Db::table('mp_user')->where($whereUser)->find();
             if($user_exist) {
