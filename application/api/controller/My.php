@@ -416,8 +416,7 @@ class My extends Common {
         $order = ['id'=>'DESC'];
         try {
             $whereCollect = [
-                ['uid','=',$this->myinfo['id']],
-                ['del','=',0]
+                ['uid','=',$this->myinfo['id']]
             ];
             $collect_orderids = Db::table('mp_collect')->where($whereCollect)->column('order_id');
             if(empty($collect_orderids)) {
@@ -446,6 +445,44 @@ class My extends Common {
             $v['create_time'] = date('Y-m-d',$v['create_time']);
         }
         return ajax($list);
+    }
+
+    public function collectCancel() {
+        $val['order_id'] = input('post.order_id');
+        checkPost($val);
+        try {
+            $where = [
+                ['order_id','=',$val['order_id']],
+                ['uid','=',$this->myinfo['id']]
+            ];
+            $exist = Db::table('mp_collect')->where($where)->find();
+            if(!$exist) {
+                return ajax('非法参数',-4);
+            }
+            Db::table('mp_collect')->where($where)->delete();
+        } catch (\Exception $e) {
+            return ajax($e->getMessage(), -1);
+        }
+        return ajax();
+    }
+
+    public function offerCancel() {
+        $val['order_id'] = input('post.order_id');
+        checkPost($val);
+        try {
+            $where = [
+                ['order_id','=',$val['order_id']],
+                ['uid','=',$this->myinfo['id']]
+            ];
+            $exist = Db::table('mp_offer_price')->where($where)->find();
+            if(!$exist) {
+                return ajax('非法参数',-4);
+            }
+            Db::table('mp_offer_price')->where($where)->delete();
+        } catch (\Exception $e) {
+            return ajax($e->getMessage(), -1);
+        }
+        return ajax();
     }
 
     //充值VIP下单

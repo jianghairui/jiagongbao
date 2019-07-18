@@ -113,7 +113,18 @@ class Api extends Common {
         $perpage = input('post.perpage',15);
         $cate_id = input('post.cate_id','');
         $search = input('post.search','');
+        $province_code = input('post.province_code','');
+        $city_code = input('post.city_code','');
+        $region_code = input('post.region_code','');
         $order = ['id'=>'DESC'];
+
+        if ($province_code) {
+            $where[] = ['province_code','=',$province_code];
+        }elseif ($city_code) {
+            $where[] = ['city_code','=',$city_code];
+        }elseif ($region_code) {
+            $where[] = ['region_code','=',$region_code];
+        }
         try {
             $where = [
                 ['status','=',1],
