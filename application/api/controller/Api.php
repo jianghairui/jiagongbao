@@ -118,18 +118,18 @@ class Api extends Common {
         $region_code = input('post.region_code','');
         $order = ['id'=>'DESC'];
 
-        if ($province_code) {
-            $where[] = ['province_code','=',$province_code];
-        }elseif ($city_code) {
-            $where[] = ['city_code','=',$city_code];
-        }elseif ($region_code) {
-            $where[] = ['region_code','=',$region_code];
-        }
         try {
             $where = [
                 ['status','=',1],
                 ['del','=',0]
             ];
+            if ($province_code) {
+                $where[] = ['province_code','=',$province_code];
+            }elseif ($city_code) {
+                $where[] = ['city_code','=',$city_code];
+            }elseif ($region_code) {
+                $where[] = ['region_code','=',$region_code];
+            }
             if($search) {
                 $where[] = ['title','like',"%{$search}%"];
             }
@@ -138,9 +138,9 @@ class Api extends Common {
                 $find_in_set = "FIND_IN_SET('".$cate_id."',cate_ids)";
             }
             $list = Db::table('mp_order')
-                ->where($where)
-                ->where($find_in_set)
                 ->order($order)
+                ->where($find_in_set)
+                ->where($where)
                 ->limit(($curr_page-1)*$perpage,$perpage)
                 ->field('id,pics,title,address,num,create_time,end_time')->select();
         } catch(\Exception $e) {
