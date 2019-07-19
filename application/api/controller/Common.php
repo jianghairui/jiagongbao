@@ -33,6 +33,8 @@ class Common extends Controller {
             'Login/phonelogin',
             'Login/getpasswdsms',
             'Login/resetpasswd',
+            'Login/registersms',
+            'Login/register',
             'Api/getslidelist',
             'Api/getcatelist',
             'Api/getallcatelist',

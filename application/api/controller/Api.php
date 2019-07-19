@@ -215,6 +215,31 @@ class Api extends Common {
         return ajax();
     }
 
+    public function checkIfMyOrder() {
+        $val['order_id'] = input('post.order_id');
+        checkPost($val);
+        try {
+            $whereOrder = [
+                ['id','=',$val['order_id']],
+                ['del','=',0]
+            ];
+            $order_exist = Db::table('mp_order')
+                ->where($whereOrder)
+                ->find();
+            if(!$order_exist) {
+                return ajax('非法参数',4);
+            }
+            if($order_exist['uid'] == $this->myinfo['id']) {
+                return ajax(true);
+            }else {
+                return ajax(false);
+            }
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+
+    }
+
     //获取订单详情
     public function getOrderDetail() {
         $val['order_id'] = input('post.order_id');
