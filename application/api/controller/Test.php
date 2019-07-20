@@ -15,15 +15,36 @@ class Test extends Controller {
     public function test() {
         $app_key = '8e123d2b7b9f85f29457b1fb';
         $master_secret = '84469df28646b679085ca3ca';
-        $client = new JPush($app_key, $master_secret);
 
-        $pusher = $client->push();
-        $platform_all = 'all';
-        $platform = ['ios', 'android'];
-        $pusher->setPlatform($platform);
-        $pusher->addAllAudience();
-        $pusher->setNotificationAlert('欢迎使用加工宝APP');
+        $alias = ['1','2'];
+        $content = 'this is the content' . time();
+        $params = [
+            'order_id' => '2'
+        ];
+        $ios_badge = 0;
+        $title = 'this is title';
         try {
+            $client = new JPush($app_key, $master_secret);
+            $pusher = $client->push();
+
+//        $platform_all = 'all';
+            $platform = ['ios', 'android'];
+            $platform = ['android'];
+            $pusher->setPlatform($platform);
+            $pusher->addAllAudience();
+//            $pusher->addAlias($alias);
+            $pusher->iosNotification (
+                $content, [
+                'sound' => '1',
+                'badge' => (int)$ios_badge,
+                'content-available' => true,
+                'category' => 'jiguang',
+                'extras' => $params,
+            ])->androidNotification ($content, [
+                'title' => $title,
+                //'build_id' => 2,
+                'extras' => $params,
+            ]);
             $result = $pusher->send();
         } catch (\JPush\Exceptions\JPushException $e) {
             // try something else here
