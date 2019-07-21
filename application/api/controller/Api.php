@@ -370,7 +370,7 @@ class Api extends Common {
             }
 
             if(time() > strtotime($order_exist['end_time'])) {
-                return ajax('订单已失效',54);
+                return ajax('订单已过期',54);
             }
             $whereOffer = [
                 ['uid','=',$this->myinfo['id']],
