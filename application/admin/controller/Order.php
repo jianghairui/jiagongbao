@@ -250,7 +250,6 @@ class Order extends Base {
         $val['file_path'] = input('post.file_path','');
         $images = input('post.pic_url',[]);
         $val['create_time'] = time();
-        $val['check_time'] = time();
         $val['status'] = 1;
 
         try {
@@ -319,9 +318,6 @@ class Order extends Base {
         $val['cate_ids'] = input('post.cate_ids',[]);
         $val['file_path'] = input('post.file_path','');
         $images = input('post.pic_url',[]);
-        $val['create_time'] = time();
-        $val['check_time'] = time();
-        $val['status'] = 1;
 
         try {
             $whereOrder = [
@@ -419,7 +415,7 @@ class Order extends Base {
             if(!$exist) {
                 return ajax('非法操作',-1);
             }
-            Db::table('mp_order')->where($where)->update(['status'=>1]);
+            Db::table('mp_order')->where($where)->update(['status'=>1,'check_time'=>time()]);
         } catch(\Exception $e) {
             return ajax($e->getMessage(),-1);
         }
@@ -439,7 +435,7 @@ class Order extends Base {
             if(!$exist) {
                 return ajax('非法操作',-1);
             }
-            Db::table('mp_order')->where($where)->update(['status'=>2,'reason'=>$val['reason']]);
+            Db::table('mp_order')->where($where)->update(['status'=>2,'reason'=>$val['reason'],'check_time'=>time()]);
         } catch(\Exception $e) {
             return ajax($e->getMessage(),-1);
         }
