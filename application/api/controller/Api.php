@@ -160,6 +160,7 @@ class Api extends Common {
         return ajax($list);
     }
 
+    //添加历史记录
     public function searchLog() {
         $val['search'] = input('post.search');
         checkPost($val);
@@ -187,6 +188,7 @@ class Api extends Common {
         return ajax();
     }
 
+    //查询历史记录
     public function searchLogList() {
         $uid = $this->myinfo['id'];
         $where = [
@@ -204,6 +206,7 @@ class Api extends Common {
         return ajax($list);
     }
 
+    //清除历史记录
     public function clearSearchLog() {
         $uid = $this->myinfo['id'];
         $where = [
@@ -217,6 +220,7 @@ class Api extends Common {
         return ajax();
     }
 
+    //判断是否为我的订单
     public function checkIfMyOrder() {
         $val['order_id'] = input('post.order_id');
         checkPost($val);
@@ -311,7 +315,6 @@ class Api extends Common {
         return ajax($order_exist);
     }
 
-//
     //收藏|取消订单
     public function orderCollect() {
         $val['order_id'] = input('post.order_id');
