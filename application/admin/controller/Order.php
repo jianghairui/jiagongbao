@@ -49,9 +49,11 @@ class Order extends Base {
 
         if ($param['provinceCode']) {
             $where[] = ['province_code','=',$param['provinceCode']];
-        }elseif ($param['cityCode']) {
+        }
+        if ($param['cityCode']) {
             $where[] = ['city_code','=',$param['cityCode']];
-        }elseif ($param['regionCode']) {
+        }
+        if ($param['regionCode']) {
             $where[] = ['region_code','=',$param['regionCode']];
         }
 

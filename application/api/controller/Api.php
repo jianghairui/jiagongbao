@@ -125,9 +125,11 @@ class Api extends Common {
             ];
             if ($province_code) {
                 $where[] = ['province_code','=',$province_code];
-            }elseif ($city_code) {
+            }
+            if ($city_code) {
                 $where[] = ['city_code','=',$city_code];
-            }elseif ($region_code) {
+            }
+            if ($region_code) {
                 $where[] = ['region_code','=',$region_code];
             }
             if($search) {
