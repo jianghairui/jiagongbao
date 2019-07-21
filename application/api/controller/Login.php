@@ -21,6 +21,13 @@ class Login extends Common {
             return ajax('invalid tel',6);
         }
         try {
+            $whereUser = [
+                ['tel','=',$val['tel']]
+            ];
+            $tel_exist = Db::table('mp_user')->where($whereUser)->find();
+            if($tel_exist) {
+                return ajax('此手机号已注册',52);
+            }
             $param = [
                 'tel' => $tel,
                 'code' => mt_rand(100000,999999),

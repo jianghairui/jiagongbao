@@ -42,6 +42,7 @@ class Common extends Controller {
             'Api/getprovincelist',
             'Api/getcitylist',
             'Api/getregionlist',
+            'Api/gettreaty',
             'Pay/wxpaynotify',
             'Pay/alipaynotify',
             'Qiniu/callback',

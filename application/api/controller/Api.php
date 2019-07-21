@@ -463,6 +463,16 @@ class Api extends Common {
         return ajax($list);
     }
 
+    //获取用户协议
+    public function getTreaty() {
+        try {
+            $info = Db::table('mp_setting')->where('id','=',1)->value('treaty');
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax($info);
+    }
+
 
 
 
