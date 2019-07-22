@@ -9,10 +9,24 @@ namespace app\api\controller;
 
 use JPush\Client as JPush;
 use think\Controller;
+use think\Db;
 
 class Test extends Controller {
 
     public function test() {
+        try {
+            $find1 = "FIND_IN_SET('".'1'."',cate_ids)";
+            $find2 = "FIND_IN_SET('".'10'."',cate_ids)";
+            $list = Db::table('mp_order')->where($find1)->whereOr([
+                ['id','<>',10]
+            ])->fetchSql(true)->select();
+        } catch (\Exception $e) {
+            return ajax($e->getMessage(), -1);
+        }
+        halt($list);
+    }
+
+    public function testpush() {
         $app_key = '8e123d2b7b9f85f29457b1fb';
         $master_secret = '84469df28646b679085ca3ca';
 
