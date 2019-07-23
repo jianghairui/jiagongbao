@@ -320,7 +320,6 @@ class My extends Common {
         return ajax();
     }
 
-
     //我的报价订单列表
     public function myOfferList() {
         $curr_page = input('post.page',1);
@@ -461,7 +460,7 @@ class My extends Common {
         }
         return ajax($list);
     }
-
+    //删除收藏
     public function collectCancel() {
         $val['order_id'] = input('post.order_id');
         checkPost($val);
@@ -480,7 +479,7 @@ class My extends Common {
         }
         return ajax();
     }
-
+    //删除报价
     public function offerCancel() {
         $val['order_id'] = input('post.order_id');
         checkPost($val);

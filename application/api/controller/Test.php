@@ -68,11 +68,11 @@ class Test extends Controller {
     }
 
     public function index() {
-        $app_key = getenv('app_key');
-        $master_secret = getenv('master_secret');
-        $registration_id = getenv('registration_id');
-
-        $client = new JPush($app_key, $master_secret);
+        if(is_tel('18602203158')) {
+            echo 'YES';
+        }else {
+            echo 'NO';
+        }
     }
 
 
