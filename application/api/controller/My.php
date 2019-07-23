@@ -184,6 +184,11 @@ class My extends Common {
             if(!$order_exist) {
                 return ajax('订单不存在或状态已改变',4);
             }
+            if(strtotime($order_exist['end_time']) < time()) {
+                $order_exist['if_end'] = 1;
+            }else {
+                $order_exist['if_end'] = 0;
+            }
 
             $whereCollect = [
                 ['uid','=',$this->myinfo['id']],
@@ -368,6 +373,11 @@ class My extends Common {
                 ->field("id,title,address,cate_ids,material,num,end_time,desc,pics,file_path,compname,linkman,linktel")->find();
             if(!$order_exist) {
                 return ajax('订单不存在或状态已改变',4);
+            }
+            if(strtotime($order_exist['end_time']) < time()) {
+                $order_exist['if_end'] = 1;
+            }else {
+                $order_exist['if_end'] = 0;
             }
 
             $whereCollect = [
