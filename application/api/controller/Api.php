@@ -262,6 +262,11 @@ class Api extends Common {
             if(!$order_exist) {
                 return ajax('非法参数',4);
             }
+            if(strtotime($order_exist['end_time']) < time()) {
+                $order_exist['if_end'] = 1;
+            }else {
+                $order_exist['if_end'] = 0;
+            }
 
             $whereCollect = [
                 ['uid','=',$this->myinfo['id']],
