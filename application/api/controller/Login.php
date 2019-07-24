@@ -122,7 +122,7 @@ class Login extends Common {
             $user_exist = Db::table('mp_user')->where($whereUser)->find();
             if($user_exist) {
                 if($user_exist['del'] == 1) {
-                    return ajax('您的账号已被删除,请联系管理员恢复!',59);
+                    return ajax('账号存在异常 请联系平台管理员',59);
                 }
                 $token = md5($val['tel'] . time());
                 $update_data = [
@@ -204,11 +204,13 @@ class Login extends Common {
                 return ajax('验证码无效',16);
             }
             $whereUser = [
-                ['tel','=',$val['tel']],
-                ['del','=',0]
+                ['tel','=',$val['tel']]
             ];
             $user_exist = Db::table('mp_user')->where($whereUser)->find();
             if($user_exist) {
+                if($user_exist['del'] == 1) {
+                    return ajax('账号存在异常 请联系平台管理员',59);
+                }
                 $token = md5($val['tel'] . time());
                 $update_data = [
                     'tel' => $val['tel'],
