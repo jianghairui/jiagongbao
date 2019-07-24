@@ -37,7 +37,7 @@ class Pay extends Common {
         $val['pay_order_sn'] = create_unique_number('');
 
         $total_price = $exist['pay_price'];
-        $total_price = 0.01;
+//        $total_price = 0.01;
         $arr = [
             'appid' => $appid,
             'mch_id' => $mch_id,
@@ -156,7 +156,8 @@ class Pay extends Common {
 //生成随机订单号
             $request = new \AlipayTradeAppPayRequest();
 
-            $total_amount = 0.01;
+            $total_amount = floatval($exist['pay_price']);
+//            $total_amount = 0.01;
             $out_trade_no = $val['pay_order_sn'];
 //异步地址传值方式
             $request->setNotifyUrl("http://j.jianghairui.com/api/pay/aliPayNotify");

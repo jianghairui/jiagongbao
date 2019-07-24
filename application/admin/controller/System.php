@@ -32,6 +32,10 @@ class System extends Base {
         checkInput($val);
         $val['allow_ip'] = input('post.allow_ip');
 
+        if(!is_currency($val['vip_price'])) {
+            return ajax('无效的金额',-1);
+        }
+
         if($val['allow_ip']) {
             $ips = explode(',',$val['allow_ip']);
             foreach ($ips as $v) {
@@ -51,6 +55,7 @@ class System extends Base {
         try {
             $exist = Db::table('mp_setting')->where('id','=',1)->find();
             Db::table('mp_setting')->where('id','=',1)->update($val);
+            Db::table('mp_vip')->where('id','=',1)->update(['price'=>$val['vip_price']]);
         }catch (\Exception $e) {
             if(isset($val['vip_pic'])) {
                 @unlink($val['vip_pic']);
