@@ -195,7 +195,7 @@ class User extends Base {
             $whereOrder = [
                 ['uid','=',$id]
             ];
-            Db::table('mp_order')->where($whereOrder)->update(['del'=>1]);
+            Db::table('mp_order')->where($whereOrder)->update(['del'=>1,'token'=>'']);
         } catch(\Exception $e) {
             return ajax($e->getMessage(),-1);
         }

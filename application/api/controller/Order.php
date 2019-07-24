@@ -18,11 +18,11 @@ class Order extends Common {
         $val['material'] = input('post.material');
         $val['num'] = input('post.num');
         $val['end_time'] = input('post.end_time');
-        $val['desc'] = input('post.desc');
         $val['compname'] = input('post.compname');
         $val['linktel'] = input('post.linktel');
         $val['linkman'] = input('post.linkman');
         checkPost($val);
+        $val['desc'] = input('post.desc');
 
         $val['cate_ids'] = input('post.cate_ids',[]);
         $images = input('post.pic_url',[]);

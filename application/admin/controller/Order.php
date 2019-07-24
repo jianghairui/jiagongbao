@@ -243,11 +243,11 @@ class Order extends Base {
         $val['material'] = input('post.material');
         $val['num'] = input('post.num');
         $val['end_time'] = input('post.end_time');
-        $val['desc'] = input('post.desc');
         $val['compname'] = input('post.compname');
         $val['linktel'] = input('post.linktel');
         $val['linkman'] = input('post.linkman');
         checkInput($val);
+        $val['desc'] = input('post.desc');
         $val['cate_ids'] = input('post.cate_ids',[]);
         $val['file_path'] = input('post.file_path','');
         $images = input('post.pic_url',[]);
@@ -311,12 +311,12 @@ class Order extends Base {
         $val['material'] = input('post.material');
         $val['num'] = input('post.num');
         $val['end_time'] = input('post.end_time');
-        $val['desc'] = input('post.desc');
         $val['compname'] = input('post.compname');
         $val['linktel'] = input('post.linktel');
         $val['linkman'] = input('post.linkman');
         $val['id'] = input('post.id');
         checkInput($val);
+        $val['desc'] = input('post.desc');
         $val['cate_ids'] = input('post.cate_ids',[]);
         $val['file_path'] = input('post.file_path','');
         $images = input('post.pic_url',[]);
