@@ -109,7 +109,6 @@ class Login extends Common {
         }
         return ajax($token);
     }
-
     //账号密码登录
     public function usernameLogin() {
         $val['tel'] = input('post.tel');
@@ -119,10 +118,12 @@ class Login extends Common {
             $whereUser = [
                 ['tel','=',$val['tel']],
                 ['password','=',md5($val['password'] . config('login_key'))],
-                ['del','=',0]
             ];
             $user_exist = Db::table('mp_user')->where($whereUser)->find();
             if($user_exist) {
+                if($user_exist['del'] == 1) {
+                    return ajax('您的账号已被删除,请联系管理员恢复!',59);
+                }
                 $token = md5($val['tel'] . time());
                 $update_data = [
                     'tel' => $val['tel'],

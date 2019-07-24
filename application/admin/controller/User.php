@@ -110,7 +110,6 @@ class User extends Base {
         return ajax();
     }
 
-
     public function userDetail() {
         $id = input('param.id',0);
         try {
@@ -159,10 +158,22 @@ class User extends Base {
             $user['vip'] = 0;
         }
 
+
         try {
             $user_exist = Db::table('mp_user')->where('id','=',$user['id'])->find();
             if(!$user_exist) {
                 return ajax('非法操作',-1);
+            }
+            if($user['status'] == 2) {
+                $user['vip_time'] = strtotime('-1 days');
+                $user['vip'] = 0;
+                if($user_exist['status'] != 2) {
+                    $this->log('拉黑了ID为'.$user['id'].'的用户',2);
+                }
+            }else {
+                if($user_exist['status'] != 1) {
+                    $this->log('恢复了ID为'.$user['id'].'的用户',2);
+                }
             }
             $whereUser = [
                 ['tel','=',$user['tel']],
@@ -196,6 +207,7 @@ class User extends Base {
                 ['uid','=',$id]
             ];
             Db::table('mp_order')->where($whereOrder)->update(['del'=>1,'token'=>'']);
+            $this->log('删除ID为'.$id.'的用户',1);
         } catch(\Exception $e) {
             return ajax($e->getMessage(),-1);
         }
@@ -203,11 +215,47 @@ class User extends Base {
     }
 
     public function userStop() {
-
+        $id = input('post.id');
+        try {
+            $where = [
+                ['id','=',$id]
+            ];
+            $exist = Db::table('mp_user')->where($where)->find();
+            if(!$exist) {
+                return ajax('非法操作',-1);
+            }
+            Db::table('mp_user')->where($where)->update(['del'=>1]);
+            $whereOrder = [
+                ['uid','=',$id]
+            ];
+            Db::table('mp_order')->where($whereOrder)->update(['status'=>2,'token'=>'']);
+            $this->log('拉黑ID为'.$id.'的用户',1);
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax();
     }
 
     public function userStart() {
-
+        $id = input('post.id');
+        try {
+            $where = [
+                ['id','=',$id]
+            ];
+            $exist = Db::table('mp_user')->where($where)->find();
+            if(!$exist) {
+                return ajax('非法操作',-1);
+            }
+            Db::table('mp_user')->where($where)->update(['del'=>1]);
+            $whereOrder = [
+                ['uid','=',$id]
+            ];
+            Db::table('mp_order')->where($whereOrder)->update(['status'=>1,'token'=>'']);
+            $this->log('恢复ID为'.$id.'的用户',1);
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax();
     }
 
 

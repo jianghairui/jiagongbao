@@ -164,8 +164,58 @@
                 },
                 error:function(data) {
                     console.log('接口请求失败');
-                },
+                }
             });
+        });
+    }
+
+    function user_stop(obj,id) {
+        layer.confirm('确认要拉黑吗？',function(index){
+            $.ajax({
+                url:"{:url('Member/userStop')}",
+                type:'post',
+                dataType:'json',
+                data:{id:id},
+                success:function(data) {
+                    console.log(data)
+                    if(data.code == 1) {
+                        $(obj).parents("tr").find(".td-status").html('<span class="label label-danger radius">已拉黑</span>')
+                        $(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="user_start(this,'+id+')" href="javascript:;" title="恢复"><i class="Hui-iconfont">&#xe66b;</i></a>');
+                        $(obj).remove();
+                        layer.msg('已拉黑!',{icon: 1,time:1000});
+                    }else {
+                        layer.msg(data.data,{icon:2,time:1000})
+                    }
+                },
+                error:function(data) {
+                    layer.msg('请求失败!',{icon:5,time:1000})
+                },
+            })
+        });
+    }
+
+    function user_start(obj,id) {
+        layer.confirm('确认恢复吗？',function(index){
+            $.ajax({
+                url:"{:url('Member/userGetback')}",
+                type:'post',
+                dataType:'json',
+                data:{id:id},
+                success:function(data) {
+                    console.log(data)
+                    if(data.code == 1) {
+                        $(obj).parents("tr").find(".td-status").html('<span class="label label-success radius">正常</span>')
+                        $(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="user_stop(this,'+id+')" href="javascript:;" title="恢复"><i class="Hui-iconfont">&#xe631;</i></a>');
+                        $(obj).remove();
+                        layer.msg('已恢复!',{icon: 1,time:1000});
+                    }else {
+                        layer.msg(data.data,{icon:2,time:1000})
+                    }
+                },
+                error:function(data) {
+                    layer.msg('请求失败!',{icon:5,time:1000})
+                },
+            })
         });
     }
 
