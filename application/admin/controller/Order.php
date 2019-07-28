@@ -193,7 +193,7 @@ class Order extends Base {
         }
         return ajax($list);
     }
-//获取区列表
+    //获取区列表
     public function getRegionList() {
         $val['cityCode'] = input('post.cityCode');
         try {
@@ -563,9 +563,6 @@ class Order extends Base {
         }
     }
 
-    public function cateUnset() {
-
-    }
     //轮播图排序
     public function orderCateSort() {
         $val['id'] = input('post.id');

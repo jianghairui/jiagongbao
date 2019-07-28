@@ -29,7 +29,7 @@
             </dd>
         </dl>
         <dl id="menu-admin">
-            <dt><i class="Hui-iconfont">&#xe62d;</i> 管理员管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dt><i class="Hui-iconfont">&#xe62d;</i> 管理员设置<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
             <dd>
                 <ul>
                     <li><a data-href="{:url('Admin/adminlist')}" data-title="管理员列表" href="javascript:void(0)">管理员列表</a></li>
@@ -47,6 +47,87 @@
                 </ul>
             </dd>
         </dl>
+
+    {else /}
+
+        {if in_array(strtolower('Banner'),$authlist)}
+        <dl id="banner">
+            <dt><i class="Hui-iconfont">&#xe625;</i> 首页设置<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    {if in_array(strtolower('Banner/slideshow'),$authlist)}
+                    <li><a data-href="{:url('Banner/slideshow')}" data-title="轮播图" href="javascript:;">轮播图设置</a></li>
+                    {/if}
+                    {if in_array(strtolower('Banner/company'),$authlist)}
+                    <li><a data-href="{:url('Banner/company')}" data-title="关于我们" href="javascript:;">关于我们</a></li>
+                    {/if}
+                </ul>
+            </dd>
+        </dl>
+        {/if}
+        {if in_array(strtolower('Order'),$authlist)}
+        <dl id="order">
+            <dt><i class="Hui-iconfont">&#xe64b;</i> 订单管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    {if in_array(strtolower('Order/orderList'),$authlist)}
+                    <li><a data-href="{:url('Order/orderList')}" data-title="订单列表" href="javascript:void(0);">订单列表</a></li>
+                    {/if}
+                    {if in_array(strtolower('Order/cateList'),$authlist)}
+                    <li><a data-href="{:url('Order/cateList')}" data-title="分类管理" href="javascript:void(0);">分类管理</a></li>
+                    {/if}
+                </ul>
+            </dd>
+        </dl>
+        {/if}
+        {if in_array(strtolower('User'),$authlist)}
+        <dl id="member">
+            <dt><i class="Hui-iconfont">&#xe60d;</i> 会员管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    {if in_array(strtolower('User/userlist'),$authlist)}
+                    <li><a data-href="{:url('User/userlist')}" data-title="会员列表" href="javascript:void(0);">会员列表</a></li>
+                    {/if}
+                    {if in_array(strtolower('User/rechargeList'),$authlist)}
+                    <li><a data-href="{:url('User/rechargeList')}" data-title="充值列表" href="javascript:void(0);">充值列表</a></li>
+                    {/if}
+                </ul>
+            </dd>
+        </dl>
+        {/if}
+        {if in_array(strtolower('Admin'),$authlist)}
+        <dl id="admin">
+            <dt><i class="Hui-iconfont">&#xe62d;</i> 管理员设置<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    {if in_array(strtolower('Admin/adminlist'),$authlist)}
+                    <li><a data-href="{:url('Admin/adminlist')}" data-title="管理员列表" href="javascript:void(0)">管理员列表</a></li>
+                    {/if}
+                    {if in_array(strtolower('Admin/grouplist'),$authlist)}
+                    <li><a data-href="{:url('Admin/grouplist')}" data-title="角色管理" href="javascript:void(0)">角色管理</a></li>
+                    {/if}
+                    {if in_array(strtolower('Admin/rulelist'),$authlist)}
+                    <li><a data-href="{:url('Admin/rulelist')}" data-title="权限管理" href="javascript:void(0)">权限管理</a></li>
+                    {/if}
+                </ul>
+            </dd>
+        </dl>
+        {/if}
+        {if in_array(strtolower('System'),$authlist)}
+        <dl id="system">
+            <dt><i class="Hui-iconfont">&#xe62e;</i> 系统管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    {if in_array(strtolower('System/setting'),$authlist)}
+                    <li><a data-href="{:url('System/setting')}" data-title="系统设置" href="javascript:void(0)">系统设置</a></li>
+                    {/if}
+                    {if in_array(strtolower('System/syslog'),$authlist)}
+                    <li><a data-href="{:url('System/syslog')}" data-title="系统日志" href="javascript:void(0)">系统日志</a></li>
+                    {/if}
+                </ul>
+            </dd>
+        </dl>
+        {/if}
     {/if}
 
     </div>

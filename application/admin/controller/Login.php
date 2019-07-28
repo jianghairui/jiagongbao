@@ -101,9 +101,9 @@ class Login extends Base {
         $id = session('admin_id');
         $val['realname'] = input('post.realname');
         $val['gender'] = input('post.gender');
+        checkInput($val);
         $val['tel'] = input('post.tel');
         $val['email'] = input('post.email');
-        checkInput($val);
         $val['password'] = input('post.password');
         $val['desc'] = input('post.desc');
         if($val['password']) {

@@ -258,7 +258,6 @@ class User extends Base {
         return ajax();
     }
 
-
     public function rechargeList() {
         $param['status'] = input('param.status','');
         $param['logmin'] = input('param.logmin');
