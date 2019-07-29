@@ -236,9 +236,10 @@ class My extends Common {
                 ['p.order_id','=',$val['order_id']]
             ];
             $list = Db::table('mp_offer_price')->alias('p')
-                ->join('mp_userinfo u','p.uid=u.uid','left')
+                ->join('mp_userinfo i','p.uid=i.uid','left')
+                ->join('mp_user u','p.uid=u.id','left')
                 ->where($where)
-                ->field('p.price,u.*')
+                ->field('p.price,p.create_time AS offer_time,i.*,u.vip')
                 ->order($order)
                 ->select();
         } catch(\Exception $e) {
