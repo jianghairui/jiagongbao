@@ -57,7 +57,7 @@
                     {/if}
                 </td>
                 <td>{$li.vip_pv}</td>
-                <td>{$li.create_time|date="Y-m-d h:i:s"}</td>
+                <td>{$li.create_time|date="Y-m-d H:i:s"}</td>
                 <td class="td-manage">
                     <a style="text-decoration:none" onclick="add_info('用户详情','{:url("User/userDetail",array("id"=>$li["id"]))}')" class="ml-5" href="javascript:;" title="查看详情">
                         <i class="Hui-iconfont">&#xe6df;</i>
