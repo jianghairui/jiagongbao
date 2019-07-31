@@ -19,8 +19,23 @@ class Plan extends Controller {
         $this->cmd = request()->module() . '/' . request()->controller() . '/' . request()->action();
     }
 
+    public function timesInitialize() {
+        if($_SERVER['REMOTE_ADDR'] == '47.105.169.186') {
+            try {
+                $setting = Db::table('mp_setting')->find();
+                $free_times = $setting['free_chance'];
+                $res = Db::table('mp_user')->where('1','=',1)->update(['free_times'=>$free_times]);
+            } catch (\Exception $e) {
+                die($e->getMessage());
+            }
+            $this->planlog($this->cmd,$res . '条数据更新');
+            echo $res;
+        }else {
+            echo '无权访问';
+        }
+    }
+
     public function test() {
-        echo 'OK';
 //        $arr = [];
 //        try {
 //            echo $arr['name'];
@@ -28,8 +43,9 @@ class Plan extends Controller {
 //            echo 'catch result: ';
 //            die($e->getMessage());
 //        }
-//        $this->planlog($this->cmd,var_export($_SERVER['REMOTE_ADDR'],true));
+       //$this->planlog($this->cmd,var_export($_SERVER['REMOTE_ADDR'],true));
 //        halt($_SERVER);
+        //print_r($_SERVER);
     }
 
 
