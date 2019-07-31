@@ -378,9 +378,11 @@ class Api extends Common {
             if(!$order_exist) {
                 return ajax('订单不存在或状态已改变',4);
             }
-
             if(time() > strtotime($order_exist['end_time'])) {
                 return ajax('订单已过期',54);
+            }
+            if($order_exist['uid'] == $this->myinfo['id']) {
+                return ajax('自己订单不可报价',60);
             }
             $whereOffer = [
                 ['uid','=',$this->myinfo['id']],
