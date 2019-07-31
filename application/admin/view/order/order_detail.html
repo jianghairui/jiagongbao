@@ -1,5 +1,11 @@
+<link href="/lib/lightbox2/2.8.1/css/lightbox.css" rel="stylesheet" type="text/css" >
 <style>
-    .thumbnail{ width:200px;height: 200px;background-size: cover;background-position: center;position: relative}
+    .image-del {
+        position: absolute;z-index: +9;font-size: 20px;cursor: pointer;
+    }
+    .image-save {
+        position: absolute;z-index: +9;font-size: 20px;right: 10px;cursor: pointer;
+    }
 </style>
 <article class="page-container">
     <form class="form form-horizontal" id="form-article-add">
@@ -71,17 +77,24 @@
                 <span id="btn-star1" class="btn btn-primary btn-uploadstar radius ml-10"  onclick="document.getElementById('pic_up').click()">上传图片</span>
             </label>
             <div class="formControls col-xs-8 col-sm-9">
-                <div class="uploader-thum-container">
-                    <div id="fileList" class="uploader-list">
-                        <?php $images = unserialize($info['pics']);?>
-                        {foreach $images as $v}
-                        <div id="cover" class="thumbnail" style="background-image: url('/{$v}');"><div class="file-panel">
-                            <input type="hidden" value="{$v}" name="pic_url[]"/></div></div>
-                        {/foreach}
-                    </div>
-
-                    <input type="file"  id="pic_up" name="pic_up" style="display:none;">
-                </div>
+                <ul class="cl portfolio-area" id="fileList">
+                    <?php $images = unserialize($info['pics']);?>
+                    {if $images}
+                    {foreach $images as $v}
+                    <li class="item">
+                        <div class="portfoliobox">
+                            <span class="image-del" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></span>
+                            <span class="image-save" title="下载"><i class="Hui-iconfont" onclick="download('/{$v}')">&#xe641;</i></span>
+                            <div class="picbox">
+                                <a href="/{$v}" data-lightbox="gallery" data-title=""><img src="/{$v}"></a>
+                            </div>
+                            <input type="hidden" value="{$v}" name="pic_url[]"/>
+                        </div>
+                    </li>
+                    {/foreach}
+                    {/if}
+                </ul>
+                <input type="file"  id="pic_up" name="pic_up" style="display:none;">
             </div>
         </div>
         <div class="row cl">
@@ -144,7 +157,7 @@
 </article>
 <input type="file" name="qiniu" id="qiniu-file" style="display: none;">
 
-
+<script type="text/javascript" src="/lib/lightbox2/2.8.1/js/lightbox.min.js"></script>
 <script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>
 <script type="text/javascript" src="/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
 <script type="text/javascript" src="/lib/jquery.validation/1.14.0/validate-methods.js"></script>
@@ -307,8 +320,8 @@
             $("#filename").val(fileName);
         });
 
-        $(document).on("click",'.thumbnail',function(){
-            var picBox = $(this);
+        $(document).on("click",'.image-del',function(){
+            var picBox = $(this).parent().parent();
             layer.confirm("是否要删除该图片？",{
                 btn:['是','否']
             },function(){
@@ -332,7 +345,7 @@
                     console.log(data);
                     if(data.code == 1) {
                         var src = data.data.path;
-                        var html = '<div id="cover" class="thumbnail" style="background-image: url(/'+src+');"><div class="file-panel"><input type="hidden" value="'+src+'" name="pic_url[]"/></div></div>';
+                        var html = '<li class="item"><div class="portfoliobox"><span class="image-del" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></span><span class="image-save" title="下载"><i class="Hui-iconfont" onclick="download(\'/'+src+'\')">&#xe641;</i></span><div class="picbox"><a href="/'+src+'" data-lightbox="gallery" data-title=""><img src="/'+src+'"></a></div><input type="hidden" value="'+src+'" name="pic_url[]"/></div></li>';
                         $("#fileList").append(html);
                     }else {
                         layer.msg(data.data,{icon:5,time:1000});
@@ -433,5 +446,14 @@
     /*打开新页面*/
     function new_page(title,url,w,h){
         layer_show(title,url,w,h);
+    }
+
+    function download (url){
+        var a = document.createElement('a');
+        a.setAttribute('href',url);//图片地址
+        a.setAttribute('download','');//下载时文件名称
+        var evobj = document.createEvent('MouseEvents');
+        evobj.initMouseEvent('click',true,true,window,0,0,0,0,0,false,false,true,false,0,null);
+        a.dispatchEvent(evobj);
     }
 </script>
