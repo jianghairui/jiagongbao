@@ -1,0 +1,88 @@
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页
+    <span class="c-gray en">&gt;</span>
+    系统管理
+    <span class="c-gray en">&gt;</span>
+    极光推送
+    <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a>
+</nav>
+<div class="page-container">
+    <form class="form form-horizontal" id="formAjax">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>推送标题：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="新的订单通知" placeholder="" name="title" maxlength="20" id="title">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>推送内容：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="今日有新的订单,请注意查看" placeholder="" name="content" maxlength="50" id="content">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>推送平台：</label>
+            <div class="formControls col-xs-8 col-sm-9 skin-minimal">
+                <div class="radio-box">
+                    <input name="plat" type="radio" id="sex-1" value="1" checked>
+                    <label for="sex-1">全部</label>
+                </div>
+                <div class="radio-box">
+                    <input name="plat" type="radio" id="sex-2" value="2">
+                    <label for="sex-2">Android</label>
+                </div>
+                <div class="radio-box">
+                    <input name="plat" type="radio" id="sex-3" value="3">
+                    <label for="sex-3">IOS</label>
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button class="btn btn-primary radius" type="button" onclick="app_push()"><i class="Hui-iconfont">&#xe600;</i> 推送</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+
+    var push_url = "{:url('System/jgpush')}";
+    var isclick = true;
+
+
+    /*图片-禁用*/
+    function app_push(){
+        var title = $("#title").val();
+        var content = $("#content").val();
+
+        if(title == '' || content == '') {
+            layer.msg('推送标题和内容不能为空!',{icon:2,time:1000});
+            return false;
+        }
+        if(isclick) {
+            isclick = false;
+            $.ajax({
+                url:push_url,
+                type:'post',
+                dataType:'json',
+                data:{title:title,content:content},
+                success:function(data) {
+                    console.log(data.data)
+                    if(data.code == 1) {
+                        layer.msg('已推送!',{icon: 1,time:1000});
+                    }else {
+                        layer.msg(data.message,{icon:2,time:1000})
+                    }
+                    isclick = true;
+                },
+                error:function(data) {
+                    layer.msg('请求失败!',{icon:2,time:1000});
+                    isclick = true;
+                }
+            })
+        }
+
+    }
+
+</script>

@@ -7,6 +7,7 @@
  */
 namespace app\admin\controller;
 
+use JPush\Client as JPush;
 use think\Db;
 class System extends Base {
 
@@ -112,6 +113,59 @@ class System extends Base {
         $this->assign('list',$list);
         $this->assign('page',$page);
         return $this->fetch();
+    }
+
+    public function index() {
+        return $this->fetch();
+    }
+
+    public function jgpush() {
+        $app_key = '8e123d2b7b9f85f29457b1fb';
+        $master_secret = '84469df28646b679085ca3ca';
+
+        $order_id = input('post.order_id',1);
+        $title = input('post.title','default title');
+        $content = input('post.content','default content');
+        $alias = input('post.alias','1');
+        $plat = input('post.plat','all');
+
+        $audience = [];
+        $audience[] = $alias;
+        $params = [
+            'type' => 1,
+            'order_id' => $order_id
+        ];
+        $ios_badge = 0;
+        try {
+            $client = new JPush($app_key, $master_secret);
+            $pusher = $client->push();
+
+            if($plat == 'all') {
+                $platform = 'all';
+            }else {
+                $platform = [$plat];
+            }
+            $pusher->setPlatform($platform);
+//            $pusher->addAlias($audience);
+            $pusher->addAllAudience();
+            $pusher->iosNotification (
+                $content, [
+                'sound' => '1',
+                'badge' => (int)$ios_badge,
+                'content-available' => true,
+                'category' => 'jiguang',
+                'extras' => $params,
+            ])->androidNotification ($content, [
+                'title' => $title,
+                //'build_id' => 2,
+                'extras' => $params,
+            ]);
+            $result = $pusher->send();
+        } catch (\JPush\Exceptions\JPushException $e) {
+            // try something else here
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax($result);
     }
 
 

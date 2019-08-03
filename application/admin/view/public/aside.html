@@ -44,6 +44,7 @@
                 <ul>
                     <li><a data-href="{:url('System/setting')}" data-title="系统设置" href="javascript:void(0)">系统设置</a></li>
                     <li><a data-href="{:url('System/syslog')}" data-title="系统日志" href="javascript:void(0)">系统日志</a></li>
+                    <li><a data-href="{:url('System/index')}" data-title="极光推送" href="javascript:void(0)">极光推送</a></li>
                 </ul>
             </dd>
         </dl>
@@ -123,6 +124,9 @@
                     {/if}
                     {if in_array(strtolower('System/syslog'),$authlist)}
                     <li><a data-href="{:url('System/syslog')}" data-title="系统日志" href="javascript:void(0)">系统日志</a></li>
+                    {/if}
+                    {if in_array(strtolower('System/index'),$authlist)}
+                    <li><a data-href="{:url('System/index')}" data-title="极光推送" href="javascript:void(0)">极光推送</a></li>
                     {/if}
                 </ul>
             </dd>
