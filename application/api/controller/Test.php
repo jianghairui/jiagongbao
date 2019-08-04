@@ -17,7 +17,7 @@ class Test extends Controller {
         return $this->fetch();
     }
 
-    public function jipush() {
+    private function jipush() {
         $app_key = '8e123d2b7b9f85f29457b1fb';
         $master_secret = '84469df28646b679085ca3ca';
 
