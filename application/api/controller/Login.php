@@ -20,6 +20,8 @@ class Login extends Common {
         if(!is_tel($tel)) {
             return ajax('invalid tel',6);
         }
+        $tpl_code = 'SMS_168555514';
+
         try {
             $whereUser = [
                 ['tel','=',$val['tel']]
@@ -38,7 +40,6 @@ class Login extends Common {
                 if((time() - $exist['create_time']) < 60) {
                     return ajax('1分钟内不可重复发送',11);
                 }
-                $tpl_code = 'SMS_168555514';
                 $res = $sms->send($param,$tpl_code);
                 if($res->Code === 'OK') {
                     Db::table('mp_verify')->where('tel',$tel)->update($param);
@@ -47,7 +48,7 @@ class Login extends Common {
                     return ajax($res->Message,12);
                 }
             }else {
-                $res = $sms->send($param);
+                $res = $sms->send($param,$tpl_code);
                 if($res->Code === 'OK') {
                     Db::table('mp_verify')->insert($param);
                     return ajax();
