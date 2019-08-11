@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>下载</title>
+    <title>加工宝APP下载</title>
     <link rel="stylesheet" href="./d_img/animate.css">
     <style>
         *, html, body {
@@ -22,11 +22,10 @@
 
         body {
             /*height: 100vh;*/
-            /*height: 100%;*/
+            height: 100%;
             min-height: 100%;
             background: url(./d_img/mbg.jpg) no-repeat center center;
             background-size: cover;
-            width: 100%;
             margin: 0 auto;
             color: #992422;
             font-size: 14px;
@@ -34,11 +33,19 @@
             position: relative;
         }
 
+        .box {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+
+        }
+
         .ul {
             color: #fff;
             font-size: 13px;
             padding: 76px 0 0 40px;
             list-style-type: none;
+            flex-shrink: 0;
         }
 
         .ul li {
@@ -54,10 +61,11 @@
             margin: 10px 0;
             background-image: url("./d_img/mphone.png");
             background-size: cover;
-            height: 449px;
+            /*height: 36%;*/
             background-repeat: no-repeat;
             display: flex;
             padding: 0 0 0 40px;
+            flex: 1;
         }
 
 
@@ -66,13 +74,19 @@
             align-items: center;
             flex-direction: column;
             justify-content: flex-end;
-            margin:0 10px 0 0;
+            margin: 0 10px 0 0;
         }
-        .d_item{
+
+        .d_item {
             height: 21px;
             margin-bottom: 25px;
         }
-        .d_code{
+
+        .d_item img {
+            height: 100%;
+        }
+
+        .d_code {
             height: 64px;
         }
     </style>
@@ -85,14 +99,14 @@
         <li>让接单变的更简单</li>
     </ul>
     <div class="imgphone animated bounceInRight delay-1s">
-        <a class="d_box ">
-            <img src="./d_img/mios.png" alt="" class="d_item">
-            <img src="./d_img/ioscode.png" alt="" class="d_code animated rotateInDownLeft delay-2s" >
-        </a>
-        <a class="d_box">
-            <img src="./d_img/mandroid.png" alt="" class="d_item">
-            <img src="./d_img/code.jpg" alt="" class="d_code animated rotateInDownLeft delay-3s">
-        </a>
+        <div class="d_box">
+            <a href="https://apps.apple.com/cn/app/%E5%8A%A0%E5%B7%A5%E5%AE%9D/id1474355493" class="d_item animated delay-3s bounceInLeft"><img src="./d_img/mios.png" alt="" ></a>
+            <img src="./d_img/ioscode.png" alt="" class="d_code animated rotateInDownLeft delay-3s">
+        </div>
+        <div class="d_box">
+            <a href="https://a.app.qq.com/o/simple.jsp?pkgname=com.z215594238.qby" class="d_item animated delay-2s bounceInLeft"><img src="./d_img/mandroid.png" alt=""></a>
+            <img src="./d_img/androidcode.png" alt="" class="d_code animated rotateInDownLeft delay-2s">
+        </div>
     </div>
 </div>
 </body>
