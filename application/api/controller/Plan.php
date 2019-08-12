@@ -35,6 +35,23 @@ class Plan extends Controller {
         }
     }
 
+    public function vipInitialize() {
+        if($_SERVER['REMOTE_ADDR'] == '47.105.169.186') {
+            try {
+                $where = [
+                    ['vip_time','<=',time()]
+                ];
+                $res = Db::table('mp_user')->where($where)->update(['vip'=>0]);
+            } catch (\Exception $e) {
+                die($e->getMessage());
+            }
+            $this->planlog($this->cmd,$res . '条数据更新');
+            echo $res;
+        }else {
+            echo '无权访问';
+        }
+    }
+
     public function test() {
 //        $arr = [];
 //        try {
