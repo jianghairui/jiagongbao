@@ -67,6 +67,12 @@
             </div>
         </div>
         <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>单位：</label>
+            <div class="formControls col-xs-2 col-sm-2">
+                <input type="text" class="input-text" value="{$info.unit}" placeholder="件" id="unit" name="unit" maxlength="5">
+            </div>
+        </div>
+        <div class="row cl">
             <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>截止时间：</label>
             <div class="formControls col-xs-4 col-sm-4">
                 <input type="text" name="end_time" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" id="end_time" value="{$info.end_time}" class="input-text Wdate" readonly>

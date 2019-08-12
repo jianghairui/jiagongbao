@@ -8,6 +8,13 @@
     <section id="formAjax">
         <div class="text-c">
             <button onclick="removeIframe()" class="btn btn-primary radius">关闭选项卡</button>
+            <span class="select-box inline" style="width: 100px;">
+                <select name="fake" id="fake" class="select">
+                    <option value="" {if $param['fake'] === ''}selected{/if}>全部(状态)</option>
+                    <option value="0" {if $param['fake'] === '0'}selected{/if}>正常</option>
+                    <option value="1" {if $param['fake'] === '1'}selected{/if}>已作废</option>
+                </select>
+            </span>
             日期范围：
             <input type="text" onfocus="WdatePicker({ maxDate:'#F{ $dp.$D(\'logmax\')||\'%y-%M-%d\' }' })" id="logmin" value="{$Think.get.logmin}" class="input-text Wdate" style="width:120px;">
             -
@@ -59,6 +66,11 @@
                 <td>{$li.vip_pv}</td>
                 <td>{$li.create_time|date="Y-m-d H:i:s"}</td>
                 <td class="td-manage">
+                    {if $li['fake']==0}
+                    <a style="text-decoration:none" onClick="user_stop(this,{$li.id})" href="javascript:;" title="标记作废"><i class="Hui-iconfont">&#xe631;</i></a>
+                    {else /}
+                    <a style="text-decoration:none" onClick="user_start(this,{$li.id})" href="javascript:;" title="恢复"><i class="Hui-iconfont">&#xe66b;</i></a>
+                    {/if}
                     <a style="text-decoration:none" onclick="add_info('用户详情','{:url("User/userDetail",array("id"=>$li["id"]))}')" class="ml-5" href="javascript:;" title="查看详情">
                         <i class="Hui-iconfont">&#xe6df;</i>
                     </a>
@@ -101,10 +113,14 @@
     }
 
     $("#search-btn").click(function () {
+        var fake = $("#formAjax").find("#fake").val();
         var logmin = $("#formAjax").find("#logmin").val();
         var logmax = $("#formAjax").find("#logmax").val();
         var search = $("#formAjax").find("#search").val();
         var str = '';
+        if(fake.length != '') {
+            str += 'fake=' + fake
+        }
         if(logmin.length != '') {
             str += '&logmin=' + logmin
         }
@@ -118,10 +134,14 @@
     });
 
     $("#toexcel-btn").click(function () {
+        var fake = $("#formAjax").find("#fake").val();
         var logmin = $("#formAjax").find("#logmin").val();
         var logmax = $("#formAjax").find("#logmax").val();
         var search = $("#formAjax").find("#search").val();
         var str = '';
+        if(fake.length != '') {
+            str += 'fake=' + fake
+        }
         if(logmin.length != '') {
             str += '&logmin=' + logmin
         }
@@ -170,26 +190,25 @@
     }
 
     function user_stop(obj,id) {
-        layer.confirm('确认要拉黑吗？',function(index){
+        layer.confirm('确认要标记作废吗？',function(index){
             $.ajax({
-                url:"{:url('Member/userStop')}",
+                url:"{:url('User/userFake')}",
                 type:'post',
                 dataType:'json',
                 data:{id:id},
                 success:function(data) {
                     console.log(data)
                     if(data.code == 1) {
-                        $(obj).parents("tr").find(".td-status").html('<span class="label label-danger radius">已拉黑</span>')
                         $(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="user_start(this,'+id+')" href="javascript:;" title="恢复"><i class="Hui-iconfont">&#xe66b;</i></a>');
                         $(obj).remove();
-                        layer.msg('已拉黑!',{icon: 1,time:1000});
+                        layer.msg('已标记!',{icon: 1,time:1000});
                     }else {
                         layer.msg(data.data,{icon:2,time:1000})
                     }
                 },
                 error:function(data) {
                     layer.msg('请求失败!',{icon:5,time:1000})
-                },
+                }
             })
         });
     }
@@ -197,15 +216,14 @@
     function user_start(obj,id) {
         layer.confirm('确认恢复吗？',function(index){
             $.ajax({
-                url:"{:url('Member/userGetback')}",
+                url:"{:url('User/userBackFake')}",
                 type:'post',
                 dataType:'json',
                 data:{id:id},
                 success:function(data) {
                     console.log(data)
                     if(data.code == 1) {
-                        $(obj).parents("tr").find(".td-status").html('<span class="label label-success radius">正常</span>')
-                        $(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="user_stop(this,'+id+')" href="javascript:;" title="恢复"><i class="Hui-iconfont">&#xe631;</i></a>');
+                        $(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="user_stop(this,'+id+')" href="javascript:;" title="标记作废"><i class="Hui-iconfont">&#xe631;</i></a>');
                         $(obj).remove();
                         layer.msg('已恢复!',{icon: 1,time:1000});
                     }else {
@@ -214,7 +232,7 @@
                 },
                 error:function(data) {
                     layer.msg('请求失败!',{icon:5,time:1000})
-                },
+                }
             })
         });
     }

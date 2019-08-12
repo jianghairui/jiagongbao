@@ -247,6 +247,7 @@ class Order extends Base {
         $val['linktel'] = input('post.linktel');
         $val['linkman'] = input('post.linkman');
         checkInput($val);
+        $val['unit'] = input('post.unit','件');
         $val['desc'] = input('post.desc');
         $val['cate_ids'] = input('post.cate_ids',[]);
         $val['file_path'] = input('post.file_path','');
@@ -316,6 +317,7 @@ class Order extends Base {
         $val['linkman'] = input('post.linkman');
         $val['id'] = input('post.id');
         checkInput($val);
+        $val['unit'] = input('post.unit','件');
         $val['desc'] = input('post.desc');
         $val['cate_ids'] = input('post.cate_ids',[]);
         $val['file_path'] = input('post.file_path','');

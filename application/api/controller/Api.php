@@ -144,7 +144,7 @@ class Api extends Common {
                 ->where($find_in_set)
                 ->where($where)
                 ->limit(($curr_page-1)*$perpage,$perpage)
-                ->field('id,pics,title,address,num,create_time,end_time')->select();
+                ->field('id,pics,title,address,num,unit,create_time,end_time')->select();
         } catch(\Exception $e) {
             return ajax($e->getMessage(),-1);
         }
@@ -258,7 +258,7 @@ class Api extends Common {
             ];
             $order_exist = Db::table('mp_order')
                 ->where($whereOrder)
-                ->field("id,title,address,cate_ids,material,num,end_time,desc,pics,file_path,compname,linkman,linktel,create_time,status")->find();
+                ->field("id,title,address,cate_ids,material,num,unit,end_time,desc,pics,file_path,compname,linkman,linktel,create_time,status")->find();
             if(!$order_exist) {
                 return ajax('非法参数',4);
             }

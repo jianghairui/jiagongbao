@@ -22,6 +22,7 @@ class Order extends Common {
         $val['linktel'] = input('post.linktel');
         $val['linkman'] = input('post.linkman');
         checkPost($val);
+        $val['unit'] = input('post.unit','件');
         $val['desc'] = input('post.desc');
 
         $val['cate_ids'] = input('post.cate_ids',[]);

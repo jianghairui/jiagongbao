@@ -13,6 +13,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class User extends Base {
 
     public function userList() {
+        $param['fake'] = input('param.fake','');
         $param['status'] = input('param.status','');
         $param['logmin'] = input('param.logmin');
         $param['logmax'] = input('param.logmax');
@@ -29,6 +30,10 @@ class User extends Base {
 
         if(!is_null($param['status']) && $param['status'] !== '') {
             $where[] = ['u.status','=',$param['status']];
+        }
+
+        if(!is_null($param['fake']) && $param['fake'] !== '') {
+            $where[] = ['u.fake','=',$param['fake']];
         }
 
         if($param['logmin']) {
@@ -58,7 +63,7 @@ class User extends Base {
 
         $this->assign('list',$list);
         $this->assign('page',$page);
-        $this->assign('status',$param['status']);
+        $this->assign('param',$param);
         return $this->fetch();
     }
 
@@ -214,7 +219,7 @@ class User extends Base {
         return ajax();
     }
 
-    public function userStop() {
+    public function userFake() {
         $id = input('post.id');
         try {
             $where = [
@@ -224,19 +229,15 @@ class User extends Base {
             if(!$exist) {
                 return ajax('非法操作',-1);
             }
-            Db::table('mp_user')->where($where)->update(['del'=>1]);
-            $whereOrder = [
-                ['uid','=',$id]
-            ];
-            Db::table('mp_order')->where($whereOrder)->update(['status'=>2,'token'=>'']);
-            $this->log('拉黑ID为'.$id.'的用户',1);
+            Db::table('mp_user')->where($where)->update(['fake'=>1]);
+            $this->log('作废ID为'.$id.'的用户',4);
         } catch(\Exception $e) {
             return ajax($e->getMessage(),-1);
         }
         return ajax();
     }
 
-    public function userStart() {
+    public function userBackFake() {
         $id = input('post.id');
         try {
             $where = [
@@ -246,12 +247,8 @@ class User extends Base {
             if(!$exist) {
                 return ajax('非法操作',-1);
             }
-            Db::table('mp_user')->where($where)->update(['del'=>1]);
-            $whereOrder = [
-                ['uid','=',$id]
-            ];
-            Db::table('mp_order')->where($whereOrder)->update(['status'=>1,'token'=>'']);
-            $this->log('恢复ID为'.$id.'的用户',1);
+            Db::table('mp_user')->where($where)->update(['fake'=>0]);
+            $this->log('恢复作废ID为'.$id.'的用户',4);
         } catch(\Exception $e) {
             return ajax($e->getMessage(),-1);
         }
