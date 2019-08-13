@@ -161,7 +161,7 @@ class Order extends Base {
             $list = Db::table('mp_offer_price')->alias('p')
                 ->join('mp_userinfo u','p.uid=u.uid','left')
                 ->where($where)
-                ->field('p.price,p.id,u.*')
+                ->field('p.price,p.id,p.create_time AS offer_time,u.*')
                 ->limit(($curr_page - 1)*$perpage,$perpage)
                 ->order($order)
                 ->select();
