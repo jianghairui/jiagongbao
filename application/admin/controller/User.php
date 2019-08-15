@@ -45,11 +45,13 @@ class User extends Base {
         }
 
         if($param['search']) {
-            $where[] = ['u.tel','like',"%{$param['search']}%"];
+            $where[] = ['u.tel|i.name','like',"%{$param['search']}%"];
         }
 
         try {
-            $count = Db::table('mp_user')->alias('u')->where($where)->count();
+            $count = Db::table('mp_user')->alias('u')
+                ->join('mp_userinfo i','u.id=i.uid','left')
+                ->where($where)->count();
             $page['count'] = $count;
             $page['curr'] = $curr_page;
             $page['totalPage'] = ceil($count/$perpage);
