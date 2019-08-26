@@ -36,7 +36,7 @@ class Qiniu extends Base {
             'desc' => '文件描述'
         ];
         $policy = [
-            'callbackUrl' => $_SERVER['REQUEST_SCHEME'] . '://'.$_SERVER['HTTP_HOST'].'/callback.php',
+            'callbackUrl' => $_SERVER['REQUEST_SCHEME'] . '://'.$_SERVER['HTTP_HOST'].'/qiniu_callback.php',
             'callbackBody' => json_encode($callbackBody)
         ];
         $token = $auth->uploadToken($this->bucket,null,3600,$policy);
