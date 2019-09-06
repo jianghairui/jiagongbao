@@ -309,8 +309,10 @@ class Api extends Common {
             }elseif ($compname_len > 2) {
                 $order_exist['compname'] = mb_substr($order_exist['compname'],0,2,'utf-8') . str_pad('',($compname_len-2),"*");
             }
-            $order_exist['linktel'] = substr_replace($order_exist['linktel'],'****',3,4);
-
+            $linktel_len = mb_strlen($order_exist['linktel'],"utf-8");
+            if($linktel_len > 7) {
+                $order_exist['linktel'] = substr_replace($order_exist['linktel'],'****',3,4);
+            }
             $linkman_len = mb_strlen($order_exist['linkman'],"utf-8");
             if($linkman_len > 1) {
                 $order_exist['linkman'] = mb_substr($order_exist['linkman'],0,1,'utf-8') . str_pad('',($compname_len-1),"*");
