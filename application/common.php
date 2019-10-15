@@ -42,7 +42,7 @@ function if_int($str) {
 }
 
 function is_tel($tel) {
-    if(!preg_match('/^1[34578]\d{9}$/',$tel)) {
+    if(!preg_match('/^1[345789]\d{9}$/',$tel)) {
         return false;
     }
     return true;
