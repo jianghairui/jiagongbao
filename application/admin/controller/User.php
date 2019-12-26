@@ -292,6 +292,7 @@ class User extends Base {
 
         if($param['contact'] !== '') {
             $where[] = ['o.contact','=',$param['contact']];
+            $where[] = ['o.status','=',0];
         }
 
         try {
