@@ -263,6 +263,7 @@ class User extends Base {
         $param['logmax'] = input('param.logmax');
         $param['search'] = input('param.search');
         $param['status'] = input('param.status','');
+        $param['contact'] = input('param.contact','');
 
         $page['query'] = http_build_query(input('param.'));
 
@@ -289,6 +290,10 @@ class User extends Base {
             $where[] = ['o.status','=',$param['status']];
         }
 
+        if($param['contact'] !== '') {
+            $where[] = ['o.contact','=',$param['contact']];
+        }
+
         try {
             $total_income = Db::table('mp_vip_order')->alias('o')->where($where)->sum('o.pay_price');
             $count = Db::table('mp_vip_order')->alias('o')->where($where)->count();
@@ -309,6 +314,20 @@ class User extends Base {
         $this->assign('total_income',$total_income);
         $this->assign('param',$param);
         return $this->fetch();
+    }
+
+
+    public function contact() {
+        $id = input('post.id');
+        try {
+            $where = [
+                ['id','=',$id]
+            ];
+            Db::table('mp_vip_order')->where($where)->update(['contact'=>1]);
+        } catch (\Exception $e) {
+            return ajax($e->getMessage(), -1);
+        }
+        return ajax();
     }
 
 

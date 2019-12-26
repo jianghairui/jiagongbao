@@ -28,6 +28,12 @@ class Index extends Base
             ];
             $count['money_count'] = Db::table('mp_vip_order')->where($whereMoney)->sum('pay_price');
             $count['vip_pv'] = Db::table('mp_user')->sum('vip_pv');
+
+            $whereTobeContact = [
+                ['status','=',0],
+                ['contact','=',0]
+            ];
+            $count['tobe_contact_num'] = Db::table('mp_vip_order')->where($whereTobeContact)->count();
         } catch(\Exception $e) {
             return ajax($e->getMessage(),-1);
         }
