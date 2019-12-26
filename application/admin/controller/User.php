@@ -262,6 +262,7 @@ class User extends Base {
         $param['logmin'] = input('param.logmin');
         $param['logmax'] = input('param.logmax');
         $param['search'] = input('param.search');
+        $param['status'] = input('param.status','');
 
         $page['query'] = http_build_query(input('param.'));
 
@@ -270,24 +271,23 @@ class User extends Base {
 
         $where = [];
 
-        $where[] = ['o.status','=',1];
-
-//        if(!is_null($param['status']) && $param['status'] !== '') {
-//            $where[] = ['o.status','=',$param['status']];
-//        }
+//        $where[] = ['o.status','=',1];
 
         if($param['logmin']) {
-            $where[] = ['o.pay_time','>=',strtotime(date('Y-m-d 00:00:00',strtotime($param['logmin'])))];
+            $where[] = ['o.create_time','>=',strtotime(date('Y-m-d 00:00:00',strtotime($param['logmin'])))];
         }
 
         if($param['logmax']) {
-            $where[] = ['o.pay_time','<=',strtotime(date('Y-m-d 23:59:59',strtotime($param['logmax'])))];
+            $where[] = ['o.create_time','<=',strtotime(date('Y-m-d 23:59:59',strtotime($param['logmax'])))];
         }
 
         if($param['search']) {
             $where[] = ['o.pay_order_sn','like',"%{$param['search']}%"];
         }
 
+        if($param['status'] !== '') {
+            $where[] = ['o.status','=',$param['status']];
+        }
 
         try {
             $total_income = Db::table('mp_vip_order')->alias('o')->where($where)->sum('o.pay_price');
@@ -307,6 +307,7 @@ class User extends Base {
         $this->assign('page',$page);
 //        $this->assign('status',$param['status']);
         $this->assign('total_income',$total_income);
+        $this->assign('param',$param);
         return $this->fetch();
     }
 
