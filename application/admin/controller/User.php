@@ -268,7 +268,7 @@ class User extends Base {
         $page['query'] = http_build_query(input('param.'));
 
         $curr_page = input('param.page',1);
-        $perpage = input('param.perpage',10);
+        $perpage = input('param.perpage',15);
 
         $where = [];
 
@@ -295,7 +295,9 @@ class User extends Base {
         }
 
         try {
-            $total_income = Db::table('mp_vip_order')->alias('o')->where($where)->sum('o.pay_price');
+            $whereIncome = $where;
+            $whereIncome[] = ['o.status','=',1];
+            $total_income = Db::table('mp_vip_order')->alias('o')->where($whereIncome)->sum('o.pay_price');
             $count = Db::table('mp_vip_order')->alias('o')->where($where)->count();
             $page['count'] = $count;
             $page['curr'] = $curr_page;
